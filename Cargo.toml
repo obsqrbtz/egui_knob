@@ -1,0 +1,16 @@
+[package]
+name = "egui_knob"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "demo"
+path = "examples/demo.rs"
+
+[lib]
+name = "egui_knob"
+path = "src/lib.rs"
+
+[dependencies]
+egui = "0.30"
+eframe = { version = "0.30.0", features = ["default_fonts"] }

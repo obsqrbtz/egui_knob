@@ -6,7 +6,7 @@ description = "A simple knob widget for egui"
 homepage = "https://github.com/obsqrbtz/egui_knob"
 repository = "https://github.com/obsqrbtz/egui_knob"
 readme = "README.md"
-license = "MIT"
+license = "LICENSE"
 keywords = ["egui", "ui", "widget", "knob", "range"]
 categories = ["gui"]
 

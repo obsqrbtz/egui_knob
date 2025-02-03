@@ -20,7 +20,7 @@ To use the Knob widget in your project, add the following to your `Cargo.toml`:
 ```toml
 [dependencies]
 egui = "0.30"
-egui_knob = "0.1.1"
+egui_knob = "*"
 ```
 
 ## Usage example

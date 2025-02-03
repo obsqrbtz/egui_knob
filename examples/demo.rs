@@ -15,15 +15,39 @@ struct KnobExample {
 
 impl Default for KnobExample {
     fn default() -> Self {
-        Self { value: 0.5 }
+        Self { value: 0.0 }
     }
 }
 
 impl eframe::App for KnobExample {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.add(Knob::new(&mut self.value, 0.0, 1.0));
-            ui.label(format!("Value: {:.2}", self.value));
+            ui.horizontal(|ui| {
+                ui.add_space(15.0);
+                ui.add(
+                    Knob::new(&mut self.value, 0.0, 100.0)
+                        .with_label("Gain", egui_knob::LabelPosition::Bottom)
+                        .with_size(50.0),
+                );
+                ui.add_space(15.0);
+                ui.add(
+                    Knob::new(&mut self.value, 0.0, 100.0)
+                        .with_label("Gain", egui_knob::LabelPosition::Bottom)
+                        .with_size(50.0),
+                );
+                ui.add_space(15.0);
+                ui.add(
+                    Knob::new(&mut self.value, 0.0, 100.0)
+                        .with_label("Gain", egui_knob::LabelPosition::Bottom)
+                        .with_size(50.0),
+                );
+                ui.add_space(15.0);
+                ui.add(
+                    Knob::new(&mut self.value, 0.0, 100.0)
+                        .with_label("Gain", egui_knob::LabelPosition::Bottom)
+                        .with_size(50.0),
+                );
+            });
         });
     }
 }

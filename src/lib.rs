@@ -82,7 +82,24 @@ impl<'a> Knob<'a> {
 impl Widget for Knob<'_> {
     fn ui(self, ui: &mut Ui) -> Response {
         let desired_size = Vec2::splat(self.size);
-        let (rect, response) = ui.allocate_exact_size(desired_size, Sense::drag());
+
+        let label_size = if let Some(label) = &self.label {
+            let font_id = egui::FontId::proportional(self.font_size);
+            ui.painter()
+                .layout(
+                    format!("{}: {:.2}", label, self.value),
+                    font_id,
+                    Color32::WHITE,
+                    f32::INFINITY,
+                )
+                .size()
+        } else {
+            Vec2::ZERO
+        };
+
+        // Adjust desired size to include label space
+        let adjusted_size = Vec2::new(desired_size.x, desired_size.y + label_size.y + 12.0); // 12.0 is an offset for spacing
+        let (rect, response) = ui.allocate_exact_size(adjusted_size, Sense::drag());
 
         if response.dragged() {
             let delta = response.drag_delta().y;

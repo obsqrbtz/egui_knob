@@ -14,5 +14,12 @@ categories = ["gui"]
 name = "egui_knob"
 path = "src/lib.rs"
 
+[[example]]
+name = "example_knob"
+path = "examples/example_knob.rs"
+
 [dependencies]
 egui = "0.30"
+
+[dev-dependencies]
+eframe = { version = "0.30.0", features = ["default_fonts"] }

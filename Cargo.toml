@@ -2,10 +2,13 @@
 name = "egui_knob"
 version = "0.1.0"
 edition = "2021"
-
-[[bin]]
-name = "demo"
-path = "examples/demo.rs"
+description = "A simple knob widget for egui"
+homepage = "https://github.com/obsqrbtz/egui_knob"
+repository = "https://github.com/obsqrbtz/egui_knob"
+readme = "README.md"
+license = "MIT"
+keywords = ["egui", "ui", "widget", "knob", "range"]
+categories = ["gui"]
 
 [lib]
 name = "egui_knob"
@@ -13,4 +16,3 @@ path = "src/lib.rs"
 
 [dependencies]
 egui = "0.30"
-eframe = { version = "0.30.0", features = ["default_fonts"] }

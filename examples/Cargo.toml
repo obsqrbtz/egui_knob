@@ -1,0 +1,9 @@
+[package]
+name = "egui_knob_demo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+egui = "0.30"
+egui_knob = "0.1.0"
+eframe = { version = "0.30.0", features = ["default_fonts"] }

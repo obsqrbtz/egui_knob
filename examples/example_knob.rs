@@ -23,11 +23,14 @@ impl eframe::App for KnobExample {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.horizontal(|ui| {
-                ui.add(
+                if ui.add(
                     Knob::new(&mut self.value, 0.0, 100.0, egui_knob::KnobStyle::Dot)
                         .with_label("Gain", egui_knob::LabelPosition::Bottom)
                         .with_size(50.0),
-                );
+                ).changed(){
+                    println!("Value changed");
+                }
+
                 ui.add(
                     Knob::new(&mut self.value, 0.0, 100.0, egui_knob::KnobStyle::Wiper)
                         .with_label("Gain", egui_knob::LabelPosition::Bottom)

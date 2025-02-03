@@ -104,13 +104,14 @@ impl Widget for Knob<'_> {
             knob_size.y + label_size.y + label_padding * 6.0,
         );
 
-        let (rect, response) = ui.allocate_exact_size(adjusted_size, Sense::drag());
+        let (rect, mut response) = ui.allocate_exact_size(adjusted_size, Sense::drag());
 
         if response.dragged() {
             let delta = response.drag_delta().y;
             let range = self.max - self.min;
             let step = range * 0.005;
             *self.value = (*self.value - delta * step).clamp(self.min, self.max);
+            response.mark_changed();
         }
 
         let painter = ui.painter();

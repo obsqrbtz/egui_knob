@@ -81,7 +81,7 @@ impl<'a> Knob<'a> {
 
 impl Widget for Knob<'_> {
     fn ui(self, ui: &mut Ui) -> Response {
-        let desired_size = Vec2::splat(self.size);
+        let knob_size = Vec2::splat(self.size);
 
         let label_size = if let Some(label) = &self.label {
             let font_id = egui::FontId::proportional(self.font_size);
@@ -97,8 +97,17 @@ impl Widget for Knob<'_> {
             Vec2::ZERO
         };
 
-        // Adjust desired size to include label space
-        let adjusted_size = Vec2::new(desired_size.x, desired_size.y + label_size.y + 12.0); // 12.0 is an offset for spacing
+        let label_padding = 12.0;
+
+        let adjusted_size = match self.label_position {
+            LabelPosition::Top | LabelPosition::Bottom => {
+                Vec2::new(knob_size.x, knob_size.y + label_size.y + label_padding)
+            }
+            LabelPosition::Left | LabelPosition::Right => {
+                Vec2::new(knob_size.x + label_size.x + label_padding, knob_size.y)
+            }
+        };
+
         let (rect, response) = ui.allocate_exact_size(adjusted_size, Sense::drag());
 
         if response.dragged() {
@@ -110,7 +119,7 @@ impl Widget for Knob<'_> {
 
         let painter = ui.painter();
         let center = rect.center();
-        let radius = rect.width() / 2.0;
+        let radius = knob_size.x / 2.0;
         let angle = (*self.value - self.min) / (self.max - self.min) * std::f32::consts::PI * 1.5
             - std::f32::consts::PI;
 
@@ -147,19 +156,21 @@ impl Widget for Knob<'_> {
                 )
                 .size();
 
-            let label_offset = 12.0;
+            let label_offset = label_padding;
             let label_pos = match self.label_position {
                 LabelPosition::Top => {
-                    center + Vec2::new(-text_size.x / 2.0, -radius - label_offset - text_size.y)
+                    rect.center()
+                        + Vec2::new(-text_size.x / 2.0, -radius - label_offset - text_size.y)
                 }
                 LabelPosition::Bottom => {
-                    center + Vec2::new(-text_size.x / 2.0, radius + label_offset)
+                    rect.center() + Vec2::new(-text_size.x / 2.0, radius + label_offset)
                 }
                 LabelPosition::Left => {
-                    center + Vec2::new(-radius - label_offset - text_size.x, -text_size.y / 2.0)
+                    rect.center()
+                        + Vec2::new(-radius - label_offset - text_size.x, -text_size.y / 2.0)
                 }
                 LabelPosition::Right => {
-                    center + Vec2::new(radius + label_offset, -text_size.y / 2.0)
+                    rect.center() + Vec2::new(radius + label_offset, -text_size.y / 2.0)
                 }
             };
 

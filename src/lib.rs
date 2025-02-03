@@ -7,6 +7,11 @@ pub enum LabelPosition {
     Right,
 }
 
+pub enum KnobStyle {
+    Wiper,
+    Dot,
+}
+
 pub struct Knob<'a> {
     value: &'a mut f32,
     min: f32,
@@ -18,10 +23,11 @@ pub struct Knob<'a> {
     line_color: Color32,
     label: Option<String>,
     label_position: LabelPosition,
+    style: KnobStyle,
 }
 
 impl<'a> Knob<'a> {
-    pub fn new(value: &'a mut f32, min: f32, max: f32) -> Self {
+    pub fn new(value: &'a mut f32, min: f32, max: f32, style: KnobStyle) -> Self {
         Self {
             value,
             min,
@@ -33,6 +39,7 @@ impl<'a> Knob<'a> {
             line_color: Color32::GRAY,
             label: None,
             label_position: LabelPosition::Bottom,
+            style,
         }
     }
 
@@ -82,23 +89,28 @@ impl Widget for Knob<'_> {
         let angle = (*self.value - self.min) / (self.max - self.min) * std::f32::consts::PI * 1.5
             - std::f32::consts::PI;
 
-        // Draw knob circle
         painter.circle_stroke(
             center,
             radius,
             Stroke::new(self.stroke_width, self.knob_color),
         );
 
-        // Draw pointer line
-        let pointer = center + Vec2::angled(angle) * (radius * 0.7);
-        painter.line_segment(
-            [center, pointer],
-            Stroke::new(self.stroke_width * 1.5, self.line_color),
-        );
+        match self.style {
+            KnobStyle::Wiper => {
+                let pointer = center + Vec2::angled(angle) * (radius * 0.7);
+                painter.line_segment(
+                    [center, pointer],
+                    Stroke::new(self.stroke_width * 1.5, self.line_color),
+                );
+            }
+            KnobStyle::Dot => {
+                let dot_pos = center + Vec2::angled(angle) * (radius * 0.7);
+                painter.circle_filled(dot_pos, self.stroke_width * 1.5, self.line_color);
+            }
+        }
 
         if let Some(label) = self.label {
             let label_text = format!("{label}: {:.2}", self.value);
-
             let font_id = egui::FontId::proportional(self.font_size);
             let text_size = ui
                 .painter()

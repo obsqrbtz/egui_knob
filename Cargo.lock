@@ -896,7 +896,7 @@ dependencies = [
 
 [[package]]
 name = "egui_knob"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "eframe",
  "egui",

@@ -21,6 +21,7 @@ pub struct Knob<'a> {
     stroke_width: f32,
     knob_color: Color32,
     line_color: Color32,
+    text_color: Color32,
     label: Option<String>,
     label_position: LabelPosition,
     style: KnobStyle,
@@ -37,6 +38,7 @@ impl<'a> Knob<'a> {
             stroke_width: 2.0,
             knob_color: Color32::GRAY,
             line_color: Color32::GRAY,
+            text_color: Color32::WHITE,
             label: None,
             label_position: LabelPosition::Bottom,
             style,
@@ -58,9 +60,15 @@ impl<'a> Knob<'a> {
         self
     }
 
-    pub fn with_colors(mut self, knob_color: Color32, line_color: Color32) -> Self {
+    pub fn with_colors(
+        mut self,
+        knob_color: Color32,
+        line_color: Color32,
+        text_color: Color32,
+    ) -> Self {
         self.knob_color = knob_color;
         self.line_color = line_color;
+        self.text_color = text_color;
         self
     }
 
@@ -143,7 +151,7 @@ impl Widget for Knob<'_> {
                 Align2::LEFT_TOP,
                 label_text,
                 font_id,
-                Color32::WHITE,
+                self.text_color,
             );
         }
 

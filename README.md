@@ -1,6 +1,8 @@
-# Knob Widget
+# egui_knob
 
 Simple knob widget for egui.
+
+![Knob Widget Screenshot](scrot.png)
 
 ## Features
 
@@ -31,7 +33,7 @@ let knob = Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
     .with_size(50.0)
     .with_font_size(14.0)
     .with_stroke_width(3.0)
-    .with_colors(Color32::GRAY, Color32::WHITE)
+    .with_colors(Color32::GRAY, Color32::WHITE, Color32::WHITE)
     .with_label("Volume", LabelPosition::Top);
 
 egui::CentralPanel::default().show(ctx, |ui| {

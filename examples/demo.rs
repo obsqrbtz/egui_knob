@@ -35,6 +35,28 @@ impl eframe::App for KnobExample {
                         .with_label("Gain", egui_knob::LabelPosition::Bottom)
                         .with_size(50.0),
                 );
+                ui.add_space(15.0);
+                ui.add(
+                    Knob::new(&mut self.value, 0.0, 100.0, egui_knob::KnobStyle::Dot)
+                        .with_label("Gain", egui_knob::LabelPosition::Bottom)
+                        .with_colors(
+                            egui::Color32::DARK_GRAY,
+                            egui::Color32::WHITE,
+                            egui::Color32::WHITE,
+                        )
+                        .with_size(50.0),
+                );
+                ui.add_space(15.0);
+                ui.add(
+                    Knob::new(&mut self.value, 0.0, 100.0, egui_knob::KnobStyle::Wiper)
+                        .with_label("Gain", egui_knob::LabelPosition::Bottom)
+                        .with_colors(
+                            egui::Color32::DARK_GRAY,
+                            egui::Color32::WHITE,
+                            egui::Color32::LIGHT_BLUE,
+                        )
+                        .with_size(50.0),
+                );
             });
         });
     }

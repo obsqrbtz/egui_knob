@@ -178,8 +178,8 @@ impl Widget for Knob<'_> {
             );
         }
 
-        // Draw the boundary rectangle
-        painter.rect_stroke(rect, 0.0, Stroke::new(1.0, Color32::RED));
+        // Draw the bounding rect
+        //painter.rect_stroke(rect, 0.0, Stroke::new(1.0, Color32::RED));
 
         response
     }

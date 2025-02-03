@@ -33,7 +33,6 @@ impl eframe::App for KnobExample {
                         .with_label("Gain", egui_knob::LabelPosition::Bottom)
                         .with_size(50.0),
                 );
-                ui.add_space(15.0);
                 ui.add(
                     Knob::new(&mut self.value, 0.0, 100.0, egui_knob::KnobStyle::Dot)
                         .with_label("Gain", egui_knob::LabelPosition::Bottom)
@@ -44,7 +43,6 @@ impl eframe::App for KnobExample {
                         )
                         .with_size(50.0),
                 );
-                ui.add_space(15.0);
                 ui.add(
                     Knob::new(&mut self.value, 0.0, 100.0, egui_knob::KnobStyle::Wiper)
                         .with_label("Gain", egui_knob::LabelPosition::Bottom)

@@ -97,16 +97,12 @@ impl Widget for Knob<'_> {
             Vec2::ZERO
         };
 
-        let label_padding = 12.0;
+        let label_padding = 2.0;
 
-        let adjusted_size = match self.label_position {
-            LabelPosition::Top | LabelPosition::Bottom => {
-                Vec2::new(knob_size.x, knob_size.y + label_size.y + label_padding)
-            }
-            LabelPosition::Left | LabelPosition::Right => {
-                Vec2::new(knob_size.x + label_size.x + label_padding, knob_size.y)
-            }
-        };
+        let adjusted_size = Vec2::new(
+            knob_size.x + label_size.y + label_padding * 6.0,
+            knob_size.y + label_size.y + label_padding * 6.0,
+        );
 
         let (rect, response) = ui.allocate_exact_size(adjusted_size, Sense::drag());
 
@@ -156,21 +152,20 @@ impl Widget for Knob<'_> {
                 )
                 .size();
 
-            let label_offset = label_padding;
             let label_pos = match self.label_position {
                 LabelPosition::Top => {
                     rect.center()
-                        + Vec2::new(-text_size.x / 2.0, -radius - label_offset - text_size.y)
+                        + Vec2::new(-text_size.x / 2.0, -radius - label_padding - text_size.y)
                 }
                 LabelPosition::Bottom => {
-                    rect.center() + Vec2::new(-text_size.x / 2.0, radius + label_offset)
+                    rect.center() + Vec2::new(-text_size.x / 2.0, radius + label_padding)
                 }
                 LabelPosition::Left => {
                     rect.center()
-                        + Vec2::new(-radius - label_offset - text_size.x, -text_size.y / 2.0)
+                        + Vec2::new(-radius - label_padding - text_size.x, -text_size.y / 2.0)
                 }
                 LabelPosition::Right => {
-                    rect.center() + Vec2::new(radius + label_offset, -text_size.y / 2.0)
+                    rect.center() + Vec2::new(radius + label_padding, -text_size.y / 2.0)
                 }
             };
 
@@ -182,6 +177,9 @@ impl Widget for Knob<'_> {
                 self.text_color,
             );
         }
+
+        // Draw the boundary rectangle
+        painter.rect_stroke(rect, 0.0, Stroke::new(1.0, Color32::RED));
 
         response
     }

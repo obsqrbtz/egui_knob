@@ -1,5 +1,7 @@
 # egui_knob
 
+![Crates.io Version](https://img.shields.io/crates/v/egui_knob)
+
 Simple knob widget for egui.
 
 ![Knob Widget Screenshot](scrot.png)

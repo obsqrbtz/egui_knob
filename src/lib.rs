@@ -1,5 +1,6 @@
 use egui::{Align2, Color32, Rect, Response, Sense, Stroke, Ui, Vec2, Widget};
 
+/// Position of the label relative to the knob
 pub enum LabelPosition {
     Top,
     Bottom,
@@ -7,11 +8,24 @@ pub enum LabelPosition {
     Right,
 }
 
+/// Visual style of the knob indicator
 pub enum KnobStyle {
+    /// A line extending from the center to the edge
     Wiper,
+    /// A dot on the edge of the knob
     Dot,
 }
 
+/// A circular knob widget for egui that can be dragged to change a value
+///
+/// # Example
+/// ```
+/// let mut value = 0.5;
+/// Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
+///     .with_size(50.0)
+///     .with_label("Volume", LabelPosition::Bottom)
+///     .with_step(0.1);
+/// ```
 pub struct Knob<'a> {
     value: &'a mut f32,
     min: f32,
@@ -31,6 +45,13 @@ pub struct Knob<'a> {
 }
 
 impl<'a> Knob<'a> {
+    /// Creates a new knob widget
+    ///
+    /// # Arguments
+    /// * `value` - Mutable reference to the value controlled by the knob
+    /// * `min` - Minimum value
+    /// * `max` - Maximum value
+    /// * `style` - Visual style of the knob indicator
     pub fn new(value: &'a mut f32, min: f32, max: f32, style: KnobStyle) -> Self {
         Self {
             value,
@@ -51,21 +72,30 @@ impl<'a> Knob<'a> {
         }
     }
 
+    /// Sets the size of the knob
     pub fn with_size(mut self, size: f32) -> Self {
         self.size = size;
         self
     }
 
+    /// Sets the font size for the label
     pub fn with_font_size(mut self, size: f32) -> Self {
         self.font_size = size;
         self
     }
 
+    /// Sets the stroke width for the knob's outline and indicator
     pub fn with_stroke_width(mut self, width: f32) -> Self {
         self.stroke_width = width;
         self
     }
 
+    /// Sets the colors for different parts of the knob
+    ///
+    /// # Arguments
+    /// * `knob_color` - Color of the knob's outline
+    /// * `line_color` - Color of the indicator
+    /// * `text_color` - Color of the label text
     pub fn with_colors(
         mut self,
         knob_color: Color32,
@@ -78,22 +108,39 @@ impl<'a> Knob<'a> {
         self
     }
 
+    /// Adds a label to the knob
+    ///
+    /// # Arguments
+    /// * `label` - Text to display
+    /// * `position` - Position of the label relative to the knob
     pub fn with_label(mut self, label: impl Into<String>, position: LabelPosition) -> Self {
         self.label = Some(label.into());
         self.label_position = position;
         self
     }
 
+    /// Sets the spacing between the knob and its label
     pub fn with_label_offset(mut self, offset: f32) -> Self {
         self.label_offset = offset;
         self
     }
 
+    /// Sets a custom format function for displaying the value
+    ///
+    /// # Example
+    /// ```
+    /// # let mut value = 0.5;
+    /// Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
+    ///     .with_label_format(|v| format!("{:.1}%", v * 100.0));
+    /// ```
     pub fn with_label_format(mut self, format: impl Fn(f32) -> String + 'static) -> Self {
         self.label_format = Box::new(format);
         self
     }
 
+    /// Sets the step size for value changes
+    ///
+    /// When set, the value will snap to discrete steps as the knob is dragged.
     pub fn with_step(mut self, step: f32) -> Self {
         self.step = Some(step);
         self

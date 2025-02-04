@@ -9,8 +9,9 @@ Simple knob widget for egui.
 ## Features
 
 - Adjustable size, font size, and stroke width.
-- Customizable colors for the knob and line.
+- Customizable colors for the knob, indicator and text.
 - Label positions (Top, Bottom, Left, Right).
+- Label formating.
 - Two styles: Wiper and Dot.
 
 ## Installation

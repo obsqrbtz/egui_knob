@@ -1,4 +1,4 @@
-use egui::{Align2, Color32, Response, Sense, Stroke, Ui, Vec2, Widget};
+use egui::{Align2, Color32, Rect, Response, Sense, Stroke, Ui, Vec2, Widget};
 
 pub enum LabelPosition {
     Top,
@@ -25,6 +25,7 @@ pub struct Knob<'a> {
     label: Option<String>,
     label_position: LabelPosition,
     style: KnobStyle,
+    label_offset: f32,
 }
 
 impl<'a> Knob<'a> {
@@ -42,6 +43,7 @@ impl<'a> Knob<'a> {
             label: None,
             label_position: LabelPosition::Bottom,
             style,
+            label_offset: 2.0,
         }
     }
 
@@ -77,6 +79,11 @@ impl<'a> Knob<'a> {
         self.label_position = position;
         self
     }
+
+    pub fn with_label_offset(mut self, offset: f32) -> Self {
+        self.label_offset = offset;
+        self
+    }
 }
 
 impl Widget for Knob<'_> {
@@ -99,10 +106,16 @@ impl Widget for Knob<'_> {
 
         let label_padding = 2.0;
 
-        let adjusted_size = Vec2::new(
-            knob_size.x + label_size.y + label_padding * 6.0,
-            knob_size.y + label_size.y + label_padding * 6.0,
-        );
+        let adjusted_size = match self.label_position {
+            LabelPosition::Top | LabelPosition::Bottom => Vec2::new(
+                knob_size.x.max(label_size.x + label_padding * 2.0),
+                knob_size.y + label_size.y + label_padding * 2.0 + self.label_offset,
+            ),
+            LabelPosition::Left | LabelPosition::Right => Vec2::new(
+                knob_size.x + label_size.x + label_padding * 2.0 + self.label_offset,
+                knob_size.y.max(label_size.y + label_padding * 2.0),
+            ),
+        };
 
         let (rect, mut response) = ui.allocate_exact_size(adjusted_size, Sense::drag());
 
@@ -115,7 +128,22 @@ impl Widget for Knob<'_> {
         }
 
         let painter = ui.painter();
-        let center = rect.center();
+        let knob_rect = match self.label_position {
+            LabelPosition::Left => {
+                Rect::from_min_size(rect.right_top() + Vec2::new(-knob_size.x, 0.0), knob_size)
+            }
+            LabelPosition::Right => Rect::from_min_size(rect.left_top(), knob_size),
+            LabelPosition::Top => Rect::from_min_size(
+                rect.left_bottom() + Vec2::new((rect.width() - knob_size.x) / 2.0, -knob_size.y),
+                knob_size,
+            ),
+            LabelPosition::Bottom => Rect::from_min_size(
+                rect.left_top() + Vec2::new((rect.width() - knob_size.x) / 2.0, 0.0),
+                knob_size,
+            ),
+        };
+
+        let center = knob_rect.center();
         let radius = knob_size.x / 2.0;
         let angle = (*self.value - self.min) / (self.max - self.min) * std::f32::consts::PI * 1.5
             - std::f32::consts::PI;
@@ -143,36 +171,32 @@ impl Widget for Knob<'_> {
         if let Some(label) = self.label {
             let label_text = format!("{label}: {:.2}", self.value);
             let font_id = egui::FontId::proportional(self.font_size);
-            let text_size = ui
-                .painter()
-                .layout(
-                    label_text.clone(),
-                    font_id.clone(),
-                    Color32::WHITE,
-                    f32::INFINITY,
-                )
-                .size();
 
-            let label_pos = match self.label_position {
-                LabelPosition::Top => {
-                    rect.center()
-                        + Vec2::new(-text_size.x / 2.0, -radius - label_padding - text_size.y)
-                }
-                LabelPosition::Bottom => {
-                    rect.center() + Vec2::new(-text_size.x / 2.0, radius + label_padding)
-                }
-                LabelPosition::Left => {
-                    rect.center()
-                        + Vec2::new(-radius - label_padding - text_size.x, -text_size.y / 2.0)
-                }
-                LabelPosition::Right => {
-                    rect.center() + Vec2::new(radius + label_padding, -text_size.y / 2.0)
-                }
+            let (label_pos, alignment) = match self.label_position {
+                LabelPosition::Top => (
+                    Vec2::new(
+                        rect.center().x,
+                        rect.min.y - self.label_offset + label_padding,
+                    ),
+                    Align2::CENTER_TOP,
+                ),
+                LabelPosition::Bottom => (
+                    Vec2::new(rect.center().x, rect.max.y + self.label_offset),
+                    Align2::CENTER_BOTTOM,
+                ),
+                LabelPosition::Left => (
+                    Vec2::new(rect.min.x - self.label_offset, rect.center().y),
+                    Align2::LEFT_CENTER,
+                ),
+                LabelPosition::Right => (
+                    Vec2::new(rect.max.x + self.label_offset, rect.center().y),
+                    Align2::RIGHT_CENTER,
+                ),
             };
 
             ui.painter().text(
-                label_pos,
-                Align2::LEFT_TOP,
+                label_pos.to_pos2(),
+                alignment,
                 label_text,
                 font_id,
                 self.text_color,

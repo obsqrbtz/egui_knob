@@ -27,6 +27,7 @@ pub struct Knob<'a> {
     style: KnobStyle,
     label_offset: f32,
     label_format: Box<dyn Fn(f32) -> String>,
+    step: Option<f32>,
 }
 
 impl<'a> Knob<'a> {
@@ -44,8 +45,9 @@ impl<'a> Knob<'a> {
             label: None,
             label_position: LabelPosition::Bottom,
             style,
-            label_offset: 2.0,
+            label_offset: 1.0,
             label_format: Box::new(|v| format!("{:.2}", v)),
+            step: None,
         }
     }
 
@@ -91,6 +93,11 @@ impl<'a> Knob<'a> {
         self.label_format = Box::new(format);
         self
     }
+
+    pub fn with_step(mut self, step: f32) -> Self {
+        self.step = Some(step);
+        self
+    }
 }
 
 impl Widget for Knob<'_> {
@@ -99,13 +106,9 @@ impl Widget for Knob<'_> {
 
         let label_size = if let Some(label) = &self.label {
             let font_id = egui::FontId::proportional(self.font_size);
+            let max_text = format!("{}: {}", label, (self.label_format)(self.max));
             ui.painter()
-                .layout(
-                    format!("{}: {}", label, (self.label_format)(*self.value)),
-                    font_id,
-                    Color32::WHITE,
-                    f32::INFINITY,
-                )
+                .layout(max_text, font_id, Color32::WHITE, f32::INFINITY)
                 .size()
         } else {
             Vec2::ZERO
@@ -129,8 +132,16 @@ impl Widget for Knob<'_> {
         if response.dragged() {
             let delta = response.drag_delta().y;
             let range = self.max - self.min;
-            let step = range * 0.005;
-            *self.value = (*self.value - delta * step).clamp(self.min, self.max);
+            let step = self.step.unwrap_or(range * 0.005);
+            let new_value = (*self.value - delta * step).clamp(self.min, self.max);
+
+            *self.value = if let Some(step) = self.step {
+                let steps = ((new_value - self.min) / step).round();
+                (self.min + steps * step).clamp(self.min, self.max)
+            } else {
+                new_value
+            };
+
             response.mark_changed();
         }
 

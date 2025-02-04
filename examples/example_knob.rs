@@ -69,7 +69,8 @@ impl eframe::App for KnobExample {
                     )
                     .with_size(50.0)
                     .with_font_size(14.0)
-                    .with_stroke_width(3.0),
+                    .with_stroke_width(3.0)
+                    .with_step(0.1),
                 );
 
                 ui.add(

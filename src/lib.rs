@@ -26,6 +26,7 @@ pub struct Knob<'a> {
     label_position: LabelPosition,
     style: KnobStyle,
     label_offset: f32,
+    label_format: Box<dyn Fn(f32) -> String>,
 }
 
 impl<'a> Knob<'a> {
@@ -44,6 +45,7 @@ impl<'a> Knob<'a> {
             label_position: LabelPosition::Bottom,
             style,
             label_offset: 2.0,
+            label_format: Box::new(|v| format!("{:.2}", v)),
         }
     }
 
@@ -84,6 +86,11 @@ impl<'a> Knob<'a> {
         self.label_offset = offset;
         self
     }
+
+    pub fn with_label_format(mut self, format: impl Fn(f32) -> String + 'static) -> Self {
+        self.label_format = Box::new(format);
+        self
+    }
 }
 
 impl Widget for Knob<'_> {
@@ -94,7 +101,7 @@ impl Widget for Knob<'_> {
             let font_id = egui::FontId::proportional(self.font_size);
             ui.painter()
                 .layout(
-                    format!("{}: {:.2}", label, self.value),
+                    format!("{}: {}", label, (self.label_format)(*self.value)),
                     font_id,
                     Color32::WHITE,
                     f32::INFINITY,
@@ -169,7 +176,7 @@ impl Widget for Knob<'_> {
         }
 
         if let Some(label) = self.label {
-            let label_text = format!("{label}: {:.2}", self.value);
+            let label_text = format!("{}: {}", label, (self.label_format)(*self.value));
             let font_id = egui::FontId::proportional(self.font_size);
 
             let (label_pos, alignment) = match self.label_position {

@@ -115,7 +115,8 @@ impl eframe::App for KnobExample {
                         egui::Color32::from_rgb(50, 220, 50),
                         egui::Color32::from_rgb(100, 255, 100),
                     )
-                    .with_size(50.0),
+                    .with_size(50.0)
+                    .with_label_format(|v| format!("{:.2}%", v)),
                 );
 
                 ui.add(

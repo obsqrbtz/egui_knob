@@ -11,7 +11,7 @@ Simple knob widget for egui.
 - Adjustable size, font size, and stroke width.
 - Customizable colors for the knob, indicator and text.
 - Label positions (Top, Bottom, Left, Right).
-- Label formating.
+- Label formatting.
 - Two styles: Wiper and Dot.
 
 ## Installation
@@ -20,8 +20,8 @@ To use the Knob widget in your project, add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-egui = "0.30"
-egui_knob = "*"
+egui = "0.31"
+egui_knob = "0.2.0"
 ```
 
 ## Usage example

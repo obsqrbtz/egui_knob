@@ -1,3 +1,5 @@
+use core::f32;
+
 use egui::{Align2, Color32, Rect, Response, Sense, Stroke, Ui, Vec2, Widget};
 
 /// Position of the label relative to the knob
@@ -42,6 +44,8 @@ pub struct Knob<'a> {
     label_offset: f32,
     label_format: Box<dyn Fn(f32) -> String>,
     step: Option<f32>,
+    min_angle: f32,
+    max_angle: f32,
 }
 
 impl<'a> Knob<'a> {
@@ -69,7 +73,35 @@ impl<'a> Knob<'a> {
             label_offset: 1.0,
             label_format: Box::new(|v| format!("{:.2}", v)),
             step: None,
+            min_angle: -std::f32::consts::PI,
+            max_angle: std::f32::consts::PI * 0.5,
         }
+    }
+
+    /// Sets the angular sweep range of the knob
+    ///
+    /// This controls where the knob starts and how far it can rotate. By default,
+    /// knobs start at the bottom-left (135°) and sweep 270° clockwise to bottom-right.
+    ///
+    /// # Arguments
+    /// * `start_angle_normalized` - Starting position as fraction of full circle:
+    ///   - `0.0` = bottom (6 o'clock)
+    ///   - `0.25` = left (9 o'clock)
+    ///   - `0.5` = top (12 o'clock)
+    ///   - `0.75` = right (3 o'clock)
+    /// * `range` - How far the knob can sweep as fraction of full circle:
+    ///   - `0.25` = quarter turn (90°)
+    ///   - `0.5` = half turn (180°)
+    ///   - `0.75` = three-quarter turn (270°)
+    ///   - `1.0` = full turn (360°)
+    ///   - Values > 1.0 create multi-turn knobs
+    pub fn with_sweep_range(mut self, start_angle_normalized: f32, range: f32) -> Self {
+        self.min_angle =
+            start_angle_normalized.rem_euclid(1.) * f32::consts::PI * 2. + f32::consts::PI / 2.;
+
+        // A range of 1. represent a full turn
+        self.max_angle = self.min_angle + range.max(0.) * 2. * f32::consts::PI;
+        self
     }
 
     /// Sets the size of the knob
@@ -210,8 +242,8 @@ impl Widget for Knob<'_> {
 
         let center = knob_rect.center();
         let radius = knob_size.x / 2.0;
-        let angle = (*self.value - self.min) / (self.max - self.min) * std::f32::consts::PI * 1.5
-            - std::f32::consts::PI;
+        let angle = self.min_angle
+            + (*self.value - self.min) / (self.max - self.min) * (self.max_angle - self.min_angle);
 
         painter.circle_stroke(
             center,

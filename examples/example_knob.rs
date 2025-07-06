@@ -122,7 +122,7 @@ impl eframe::App for KnobExample {
                 );
 
                 ui.add(
-                    Knob::new(&mut self.blue_value, 0.0, 100.0, egui_knob::KnobStyle::Dot)
+                    Knob::new(&mut self.blue_value, 0.0, 100., egui_knob::KnobStyle::Dot)
                         .with_label("Top", egui_knob::LabelPosition::Top)
                         .with_colors(
                             egui::Color32::from_rgb(30, 30, 80),

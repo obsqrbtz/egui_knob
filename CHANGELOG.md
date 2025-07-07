@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### 🚀 Features
+
+- Add configurable sweep range with `with_sweep_range()` method
+
 ## [0.1.9] - 2025-02-04
 
 ### 🚀 Features

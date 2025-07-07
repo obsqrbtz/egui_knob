@@ -1,3 +1,5 @@
+use core::f32;
+
 use egui::{Align2, Color32, Rect, Response, Sense, Stroke, Ui, Vec2, Widget};
 
 /// Position of the label relative to the knob
@@ -42,6 +44,17 @@ pub struct Knob<'a> {
     label_offset: f32,
     label_format: Box<dyn Fn(f32) -> String>,
     step: Option<f32>,
+
+    /// Minimum angle in radians.  
+    /// Specifies the lower bound of the knob's rotation.  
+    /// Expected range: 0.0 to TAU. Values outside this range are allowed if your use case requires it.
+    min_angle: f32,
+
+    /// Maximum angle in radians.  
+    /// Specifies the upper bound of the knob's rotation.
+    /// Can be any value > `min_angle`
+    /// range `max_angle` - `min_angle` > TAU is allowed but will induce multi-turn
+    max_angle: f32,
 }
 
 impl<'a> Knob<'a> {
@@ -69,7 +82,45 @@ impl<'a> Knob<'a> {
             label_offset: 1.0,
             label_format: Box::new(|v| format!("{:.2}", v)),
             step: None,
+
+            // Hardcode those two angles to ENSURE backward compatibility
+            min_angle: -std::f32::consts::PI,
+            max_angle: std::f32::consts::PI * 0.5,
         }
+    }
+
+    /// Sets the angular sweep range of the knob
+    ///
+    /// This controls where the knob starts and how far it can rotate. By default,
+    /// knobs start at the left (180°) and sweep 270° clockwise to bottom.
+    ///
+    /// # Arguments
+    /// * `start_angle_normalized` - Starting position as fraction of full circle:
+    ///   - `0.0` = bottom (6 o'clock)
+    ///   - `0.25` = left (9 o'clock)
+    ///   - `0.5` = top (12 o'clock)
+    ///   - `0.75` = right (3 o'clock)
+    /// * `range` - How far the knob can sweep as fraction of full circle:
+    ///   - `0.25` = quarter turn (90°)
+    ///   - `0.5` = half turn (180°)
+    ///   - `0.75` = three-quarter turn (270°)
+    ///   - `1.0` = full turn (360°)
+    ///   - Values > 1.0 create multi-turn knobs
+    ///   - Negative values are clamped to 0.0
+    ///
+    /// Note: the start angle is offset by PI/2 so that `0.0` is at the bottom (6 o'clock)
+    pub fn with_sweep_range(mut self, start_angle_normalized: f32, range: f32) -> Self {
+        if start_angle_normalized.is_nan() || range.is_nan() {
+            // Invalid input, return unchanged
+            return self;
+        }
+
+        self.min_angle =
+            start_angle_normalized.rem_euclid(1.) * f32::consts::TAU + f32::consts::PI / 2.;
+
+        // A range of 1. represent a full turn
+        self.max_angle = self.min_angle + range.max(0.) * f32::consts::TAU;
+        self
     }
 
     /// Sets the size of the knob
@@ -210,8 +261,15 @@ impl Widget for Knob<'_> {
 
         let center = knob_rect.center();
         let radius = knob_size.x / 2.0;
-        let angle = (*self.value - self.min) / (self.max - self.min) * std::f32::consts::PI * 1.5
-            - std::f32::consts::PI;
+        let angle = if self.min == self.max {
+            // If min == max, just return min angle
+            // That's a edge case, using a 0 range knob is pretty useless
+            self.min_angle
+        } else {
+            self.min_angle
+                + (*self.value - self.min) / (self.max - self.min)
+                    * (self.max_angle - self.min_angle)
+        };
 
         painter.circle_stroke(
             center,

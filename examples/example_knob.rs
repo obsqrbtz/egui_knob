@@ -117,18 +117,20 @@ impl eframe::App for KnobExample {
                         egui::Color32::from_rgb(100, 255, 100),
                     )
                     .with_size(50.0)
-                    .with_label_format(|v| format!("{:.2}%", v)),
+                    .with_label_format(|v| format!("{:.2}%", v))
+                    .with_sweep_range(1. / 8., 0.75),
                 );
 
                 ui.add(
-                    Knob::new(&mut self.blue_value, 0.0, 100.0, egui_knob::KnobStyle::Dot)
+                    Knob::new(&mut self.blue_value, 0.0, 100., egui_knob::KnobStyle::Dot)
                         .with_label("Top", egui_knob::LabelPosition::Top)
                         .with_colors(
                             egui::Color32::from_rgb(30, 30, 80),
                             egui::Color32::from_rgb(50, 50, 220),
                             egui::Color32::from_rgb(100, 100, 255),
                         )
-                        .with_size(50.0),
+                        .with_size(50.0)
+                        .with_sweep_range(0., 2.),
                 );
             });
         });

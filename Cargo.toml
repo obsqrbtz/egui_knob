@@ -1,6 +1,6 @@
 [package]
 name = "egui_knob"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "A simple knob widget for egui"
 homepage = "https://github.com/obsqrbtz/egui_knob"

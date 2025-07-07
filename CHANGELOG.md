@@ -2,11 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.3.0] - 2025-07-07
 
 ### 🚀 Features
 
-- Add configurable sweep range with `with_sweep_range()` method
+- Add configurable sweep range with `with_sweep_range()` method ([PR#2](https://github.com/obsqrbtz/egui_knob/pull/2) by [sacha-renault](https://github.com/sacha-renault))
+
+## [0.2.0] - 2025-05-12
+
+- Bump egui and eframe versions ([PR#1](https://github.com/obsqrbtz/egui_knob/pull/1) by [chloebrett](https://github.com/chloebrett))
 
 ## [0.1.9] - 2025-02-04
 

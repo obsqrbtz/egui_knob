@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [0.3.1] - 2025-07-15
 
+### 🚀 Features
+
+- Added background arc
+
+### 🐛 Bug Fixes
+
+- Sanitize NaNs
+
+## [0.3.1] - 2025-07-15
+
 ### 🛠 Maintenance
 
 - Bump egui version to 0.32

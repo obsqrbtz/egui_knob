@@ -44,6 +44,8 @@ pub struct Knob<'a> {
     label_offset: f32,
     label_format: Box<dyn Fn(f32) -> String>,
     step: Option<f32>,
+    drag_sensitivity: f32,
+    show_background_arc: bool,
 
     /// Minimum angle in radians.  
     /// Specifies the lower bound of the knob's rotation.  
@@ -86,6 +88,8 @@ impl<'a> Knob<'a> {
             // Hardcode those two angles to ENSURE backward compatibility
             min_angle: -std::f32::consts::PI,
             max_angle: std::f32::consts::PI * 0.5,
+            drag_sensitivity: 0.005,
+            show_background_arc: true,
         }
     }
 
@@ -196,6 +200,10 @@ impl<'a> Knob<'a> {
         self.step = Some(step);
         self
     }
+    pub fn with_background_arc(mut self, enabled: bool) -> Self {
+        self.show_background_arc = enabled;
+        self
+    }
     // Private
     fn compute_angle(&self) -> f32 {
         if self.min == self.max {
@@ -240,7 +248,7 @@ impl Widget for Knob<'_> {
         if response.dragged() {
             let delta = response.drag_delta().y;
             let range = self.max - self.min;
-            let step = self.step.unwrap_or(range * 0.005);
+            let step = self.step.unwrap_or(range * self.drag_sensitivity);
             let new_value = (*self.value - delta * step).clamp(self.min, self.max);
 
             *self.value = if let Some(step) = self.step {
@@ -280,6 +288,28 @@ impl Widget for Knob<'_> {
         };
 
         painter.circle_stroke(center, radius, Stroke::new(self.stroke_width, knob_color));
+
+        // Background arc (indicating full range)
+        if self.show_background_arc {
+            let arc_start = self.min_angle;
+            let arc_end = self.max_angle;
+            let segments = 64;
+            let arc_color = self.knob_color.gamma_multiply(0.5); // dimmed background arc
+            let arc_radius = radius * 0.8;
+            let mut points = Vec::with_capacity(segments + 1);
+
+            for i in 0..=segments {
+                let t = i as f32 / segments as f32;
+                let angle = arc_start + (arc_end - arc_start) * t;
+                let pos = center + Vec2::angled(angle) * arc_radius;
+                points.push(pos);
+            }
+
+            painter.add(egui::Shape::line(
+                points,
+                Stroke::new(self.stroke_width, arc_color),
+            ));
+        }
 
         match self.style {
             KnobStyle::Wiper => {

@@ -47,7 +47,8 @@ impl eframe::App for KnobExample {
                                 egui::Color32::from_rgb(60, 60, 60),
                                 egui::Color32::from_rgb(150, 150, 150),
                                 egui::Color32::from_rgb(200, 200, 200),
-                            ),
+                            )
+                            .with_background_arc(false),
                     )
                     .changed()
                 {
@@ -70,7 +71,8 @@ impl eframe::App for KnobExample {
                     .with_size(50.0)
                     .with_font_size(14.0)
                     .with_stroke_width(3.0)
-                    .with_step(0.1),
+                    .with_step(0.1)
+                    .with_background_arc(false),
                 );
 
                 ui.add(

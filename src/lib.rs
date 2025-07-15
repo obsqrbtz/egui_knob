@@ -46,6 +46,7 @@ pub struct Knob<'a> {
     step: Option<f32>,
     drag_sensitivity: f32,
     show_background_arc: bool,
+    show_filled_segments: bool,
 
     /// Minimum angle in radians.  
     /// Specifies the lower bound of the knob's rotation.  
@@ -90,6 +91,7 @@ impl<'a> Knob<'a> {
             max_angle: std::f32::consts::PI * 0.5,
             drag_sensitivity: 0.005,
             show_background_arc: true,
+            show_filled_segments: true,
         }
     }
 
@@ -200,8 +202,14 @@ impl<'a> Knob<'a> {
         self.step = Some(step);
         self
     }
+    /// Shows the background arc showing full range
     pub fn with_background_arc(mut self, enabled: bool) -> Self {
         self.show_background_arc = enabled;
+        self
+    }
+    /// Shows filled range on the background arc
+    pub fn with_show_filled_segments(mut self, enabled: bool) -> Self {
+        self.show_filled_segments = enabled;
         self
     }
     // Private
@@ -309,6 +317,26 @@ impl Widget for Knob<'_> {
                 points,
                 Stroke::new(self.stroke_width, arc_color),
             ));
+
+            // Filled part when background arc is enabled
+            if self.show_filled_segments {
+                let filled_segments = (segments as f32
+                    * ((*self.value - self.min) / (self.max - self.min)).clamp(0.0, 1.0))
+                    as usize;
+
+                let mut fill_points = Vec::with_capacity(filled_segments + 1);
+                for i in 0..=filled_segments {
+                    let t = i as f32 / segments as f32;
+                    let angle = arc_start + (arc_end - arc_start) * t;
+                    let pos = center + Vec2::angled(angle) * arc_radius;
+                    fill_points.push(pos);
+                }
+
+                painter.add(egui::Shape::line(
+                    fill_points,
+                    Stroke::new(self.stroke_width, self.line_color),
+                ));
+            }
         }
 
         match self.style {
@@ -358,6 +386,12 @@ impl Widget for Knob<'_> {
                 font_id,
                 self.text_color,
             );
+
+            if response.hovered() {
+                response
+                    .clone()
+                    .on_hover_text((self.label_format)(*self.value));
+            }
         }
 
         // Draw the bounding rect

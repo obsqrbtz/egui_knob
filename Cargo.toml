@@ -1,7 +1,7 @@
 [package]
 name = "egui_knob"
-version = "0.3.0"
-edition = "2021"
+version = "0.3.1"
+edition = "2024"
 description = "A simple knob widget for egui"
 homepage = "https://github.com/obsqrbtz/egui_knob"
 repository = "https://github.com/obsqrbtz/egui_knob"
@@ -19,7 +19,7 @@ name = "example_knob"
 path = "examples/example_knob.rs"
 
 [dependencies]
-egui = "0.31"
+egui = "0.32"
 
 [dev-dependencies]
-eframe = { version = "0.31.0", features = ["default_fonts"] }
+eframe = { version = "0.32.0", features = ["default_fonts"] }

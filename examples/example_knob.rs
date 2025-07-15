@@ -22,7 +22,7 @@ struct KnobDemo {
 impl Default for KnobDemo {
     fn default() -> Self {
         Self {
-            values: [f32::NAN; 6], // Initialize with NaN to test NaN handling
+            values: [f32::NAN; 6],
             show_bg_arc: true,
             show_filled: true,
             use_step: false,
@@ -36,7 +36,7 @@ impl Default for KnobDemo {
 impl eframe::App for KnobDemo {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("🎛 egui-knob Showcase");
+            ui.heading("🎛 egui-knob example");
             ui.separator();
 
             ui.horizontal(|ui| {

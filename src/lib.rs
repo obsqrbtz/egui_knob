@@ -196,6 +196,16 @@ impl<'a> Knob<'a> {
         self.step = Some(step);
         self
     }
+    // Private
+    fn compute_angle(&self) -> f32 {
+        if self.min == self.max {
+            self.min_angle
+        } else {
+            self.min_angle
+                + (*self.value - self.min) / (self.max - self.min)
+                    * (self.max_angle - self.min_angle)
+        }
+    }
 }
 
 impl Widget for Knob<'_> {
@@ -261,21 +271,15 @@ impl Widget for Knob<'_> {
 
         let center = knob_rect.center();
         let radius = knob_size.x / 2.0;
-        let angle = if self.min == self.max {
-            // If min == max, just return min angle
-            // That's a edge case, using a 0 range knob is pretty useless
-            self.min_angle
+        let angle = self.compute_angle();
+        let knob_hovered = response.hovered();
+        let knob_color = if knob_hovered {
+            self.knob_color.linear_multiply(1.2)
         } else {
-            self.min_angle
-                + (*self.value - self.min) / (self.max - self.min)
-                    * (self.max_angle - self.min_angle)
+            self.knob_color
         };
 
-        painter.circle_stroke(
-            center,
-            radius,
-            Stroke::new(self.stroke_width, self.knob_color),
-        );
+        painter.circle_stroke(center, radius, Stroke::new(self.stroke_width, knob_color));
 
         match self.style {
             KnobStyle::Wiper => {

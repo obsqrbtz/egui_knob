@@ -1,141 +1,112 @@
 use eframe::egui;
-use egui_knob::Knob;
+use egui_knob::{Knob, KnobStyle, LabelPosition};
 
 fn main() -> eframe::Result<()> {
     eframe::run_native(
-        "Knob Example",
+        "egui_knob demo",
         eframe::NativeOptions::default(),
-        Box::new(|_cc| Ok(Box::new(KnobExample::default()))),
+        Box::new(|_cc| Ok(Box::new(KnobDemo::default()))),
     )
 }
 
-struct KnobExample {
-    basic_value: f32,
-    purple_value: f32,
-    large_value: f32,
-    thick_value: f32,
-    red_value: f32,
-    green_value: f32,
-    blue_value: f32,
+struct KnobDemo {
+    values: [f32; 6],
+    show_bg_arc: bool,
+    show_filled: bool,
+    use_step: bool,
+    knob_color: egui::Color32,
+    line_color: egui::Color32,
+    text_color: egui::Color32,
 }
 
-impl Default for KnobExample {
+impl Default for KnobDemo {
     fn default() -> Self {
         Self {
-            basic_value: 0.0,
-            purple_value: 0.0,
-            large_value: 0.0,
-            thick_value: 0.0,
-            red_value: 0.0,
-            green_value: 0.0,
-            blue_value: 0.0,
+            values: [f32::NAN; 6], // Initialize with NaN to test NaN handling
+            show_bg_arc: true,
+            show_filled: true,
+            use_step: false,
+            knob_color: egui::Color32::DARK_GRAY,
+            line_color: egui::Color32::LIGHT_BLUE,
+            text_color: egui::Color32::WHITE,
         }
     }
 }
 
-impl eframe::App for KnobExample {
+impl eframe::App for KnobDemo {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
+            ui.heading("🎛 egui-knob Showcase");
+            ui.separator();
+
             ui.horizontal(|ui| {
-                if ui
-                    .add(
-                        Knob::new(&mut self.basic_value, 0.0, 100.0, egui_knob::KnobStyle::Dot)
-                            .with_label("Basic", egui_knob::LabelPosition::Right)
-                            .with_size(40.0)
-                            .with_font_size(10.0)
-                            .with_colors(
-                                egui::Color32::from_rgb(60, 60, 60),
-                                egui::Color32::from_rgb(150, 150, 150),
-                                egui::Color32::from_rgb(200, 200, 200),
-                            )
-                            .with_background_arc(false),
-                    )
-                    .changed()
-                {
-                    println!("Basic value changed: {}", self.basic_value);
-                }
-
-                ui.add(
-                    Knob::new(
-                        &mut self.purple_value,
-                        0.0,
-                        100.0,
-                        egui_knob::KnobStyle::Wiper,
-                    )
-                    .with_label("Purple", egui_knob::LabelPosition::Bottom)
-                    .with_colors(
-                        egui::Color32::from_rgb(60, 30, 80),
-                        egui::Color32::from_rgb(200, 100, 255),
-                        egui::Color32::from_rgb(230, 150, 255),
-                    )
-                    .with_size(50.0)
-                    .with_font_size(14.0)
-                    .with_stroke_width(3.0)
-                    .with_step(0.1)
-                    .with_background_arc(false)
-                    .with_show_filled_segments(false)
-                );
-
-                ui.add(
-                    Knob::new(&mut self.large_value, 0.0, 100.0, egui_knob::KnobStyle::Dot)
-                        .with_label("Large", egui_knob::LabelPosition::Bottom)
-                        .with_size(60.0)
-                        .with_font_size(16.0),
-                );
-
-                ui.add(
-                    Knob::new(
-                        &mut self.thick_value,
-                        0.0,
-                        100.0,
-                        egui_knob::KnobStyle::Wiper,
-                    )
-                    .with_label("Thick", egui_knob::LabelPosition::Bottom)
-                    .with_size(50.0)
-                    .with_stroke_width(4.0),
-                );
-
-                ui.add(
-                    Knob::new(&mut self.red_value, 0.0, 100.0, egui_knob::KnobStyle::Dot)
-                        .with_label("Red", egui_knob::LabelPosition::Bottom)
-                        .with_colors(
-                            egui::Color32::from_rgb(80, 30, 30),
-                            egui::Color32::from_rgb(220, 50, 50),
-                            egui::Color32::from_rgb(255, 100, 100),
-                        )
-                        .with_size(50.0),
-                );
-
-                ui.add(
-                    Knob::new(
-                        &mut self.green_value,
-                        0.0,
-                        100.0,
-                        egui_knob::KnobStyle::Wiper,
-                    )
-                    .with_label("Leftandlongtext", egui_knob::LabelPosition::Left)
-                    .with_colors(
-                        egui::Color32::from_rgb(30, 80, 30),
-                        egui::Color32::from_rgb(50, 220, 50),
-                        egui::Color32::from_rgb(100, 255, 100),
-                    )
-                    .with_size(50.0)
-                    .with_label_format(|v| format!("{:.2}%", v))
-                    .with_sweep_range(1. / 8., 0.75),
-                );
-
-                ui.add(
-                    Knob::new(&mut self.blue_value, 0.0, 100., egui_knob::KnobStyle::Dot)
-                        .with_label("Top", egui_knob::LabelPosition::Top)
-                        .with_colors(
-                            egui::Color32::from_rgb(30, 30, 80),
-                            egui::Color32::from_rgb(50, 50, 220),
-                            egui::Color32::from_rgb(100, 100, 255),
-                        )
-                        .with_size(50.0)
-                        .with_sweep_range(0., 2.),
-                );
+                ui.checkbox(&mut self.show_bg_arc, "Show background arc");
+                ui.checkbox(&mut self.show_filled, "Show filled segment");
+                ui.checkbox(&mut self.use_step, "Enable step (0.1)");
             });
+
+            ui.horizontal(|ui| {
+                ui.label("Knob Colors:");
+                ui.color_edit_button_srgba(&mut self.knob_color);
+                ui.color_edit_button_srgba(&mut self.line_color);
+                ui.color_edit_button_srgba(&mut self.text_color);
+            });
+
+            ui.separator();
+            ui.label("👇 Scroll or drag knobs to interact:");
+
+            ui.add_space(10.0);
+            egui::Grid::new("knob_grid")
+                .num_columns(3)
+                .spacing([30.0, 20.0])
+                .show(ui, |ui| {
+                    for (i, (label, config)) in [
+                        ("Basic Dot", KnobStyle::Dot),
+                        ("Wiper, Sweep", KnobStyle::Wiper),
+                        ("Thick Stroke", KnobStyle::Wiper),
+                        ("360° Sweep", KnobStyle::Wiper),
+                        ("Multi-Turn", KnobStyle::Dot),
+                        ("Large Font", KnobStyle::Wiper),
+                    ]
+                    .iter()
+                    .enumerate()
+                    {
+                        ui.vertical(|ui| {
+                            ui.label(*label);
+                            let mut knob = Knob::new(&mut self.values[i], 0.0, 1.0, *config)
+                                .with_label(*label, LabelPosition::Bottom)
+                                .with_background_arc(self.show_bg_arc)
+                                .with_show_filled_segments(self.show_filled)
+                                .with_colors(self.knob_color, self.line_color, self.text_color)
+                                .with_step(self.use_step.then_some(0.1));
+
+                            if *label == "Wiper, Sweep" {
+                                knob = knob.with_sweep_range(0.25, 0.75).with_size(50.0);
+                            }
+                            if *label == "Thick Stroke" {
+                                knob = knob.with_stroke_width(4.0).with_size(60.0);
+                            }
+                            if *label == "360° Sweep" {
+                                knob = knob.with_sweep_range(0.5, 1.0);
+                            }
+                            if *label == "Multi-Turn" {
+                                knob = knob.with_sweep_range(0.0, 2.5);
+                            }
+                            if *label == "Large Font" {
+                                knob = knob.with_size(70.0).with_font_size(18.0);
+                            }
+
+                            ui.add(knob);
+                        });
+
+                        if (i + 1) % 3 == 0 {
+                            ui.end_row();
+                        }
+                    }
+                });
+
+            ui.add_space(10.0);
+            ui.separator();
         });
     }
 }

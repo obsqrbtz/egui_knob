@@ -11,6 +11,7 @@ pub enum LabelPosition {
 }
 
 /// Visual style of the knob indicator
+#[derive(Clone, Copy)] // <--- add this!
 pub enum KnobStyle {
     /// A line extending from the center to the edge
     Wiper,
@@ -117,7 +118,6 @@ impl<'a> Knob<'a> {
     /// Note: the start angle is offset by PI/2 so that `0.0` is at the bottom (6 o'clock)
     pub fn with_sweep_range(mut self, start_angle_normalized: f32, range: f32) -> Self {
         if start_angle_normalized.is_nan() || range.is_nan() {
-            // Invalid input, return unchanged
             return self;
         }
 
@@ -198,8 +198,8 @@ impl<'a> Knob<'a> {
     /// Sets the step size for value changes
     ///
     /// When set, the value will snap to discrete steps as the knob is dragged.
-    pub fn with_step(mut self, step: f32) -> Self {
-        self.step = Some(step);
+    pub fn with_step(mut self, step: Option<f32>) -> Self {
+        self.step = step;
         self
     }
     /// Shows the background arc showing full range
@@ -214,7 +214,7 @@ impl<'a> Knob<'a> {
     }
     // Private
     fn compute_angle(&self) -> f32 {
-        if self.min == self.max {
+        if self.min == self.max || self.value.is_nan() {
             self.min_angle
         } else {
             self.min_angle
@@ -226,6 +226,10 @@ impl<'a> Knob<'a> {
 
 impl Widget for Knob<'_> {
     fn ui(self, ui: &mut Ui) -> Response {
+        if self.value.is_nan() {
+            *self.value = self.min;
+        }
+
         let knob_size = Vec2::splat(self.size);
 
         let label_size = if let Some(label) = &self.label {
@@ -265,6 +269,10 @@ impl Widget for Knob<'_> {
             } else {
                 new_value
             };
+
+            if self.value.is_nan() {
+                *self.value = self.min;
+            }
 
             response.mark_changed();
         }
@@ -356,6 +364,8 @@ impl Widget for Knob<'_> {
         if let Some(label) = self.label {
             let label_text = format!("{}: {}", label, (self.label_format)(*self.value));
             let font_id = egui::FontId::proportional(self.font_size);
+
+            let label_padding = 2.0;
 
             let (label_pos, alignment) = match self.label_position {
                 LabelPosition::Top => (

@@ -27,20 +27,40 @@ egui_knob = "0.3.3"
 ## Usage example
 
 ```rust
-use egui::{Color32, Context};
-use egui_knob::Knob;
+use egui_knob::{Knob, KnobStyle, LabelPosition};
+use eframe::{egui};
 
-// ..
+struct KnobApp {
+    value: f32,
+}
 
-let mut value: f32 = 0.5;
-let knob = Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
-    .with_size(50.0)
-    .with_font_size(14.0)
-    .with_stroke_width(3.0)
-    .with_colors(Color32::GRAY, Color32::WHITE, Color32::WHITE)
-    .with_label("Volume", LabelPosition::Top);
+impl Default for KnobApp {
+    fn default() -> Self {
+        Self { value: 0.5 }
+    }
+}
 
-egui::CentralPanel::default().show(ctx, |ui| {
-    ui.add(knob);
-});
+impl eframe::App for KnobApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            let knob = Knob::new(&mut self.value, 0.0, 1.0, KnobStyle::Wiper)
+                .with_size(50.0)
+                .with_font_size(14.0)
+                .with_colors(egui::Color32::GRAY, egui::Color32::WHITE, egui::Color32::WHITE)
+                .with_stroke_width(3.0)
+                .with_label("Volume", LabelPosition::Top);
+
+            ui.add(knob);
+        });
+    }
+}
+
+fn main() {
+    let options = eframe::NativeOptions::default();
+    eframe::run_native(
+        "Minimal",
+        options,
+        Box::new(|_cc| Ok(Box::new(KnobApp::default()) as Box<dyn eframe::App>)),
+    ).unwrap();
+}
 ```

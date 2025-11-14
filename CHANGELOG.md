@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4] - 2025-07-15
+
+### 🛠 Maintenance
+
+- Bump egui version to 0.33
+
+### 📚 Documentation
+
+- Updated usage example in readme
+
+
 ## [0.3.1] - 2025-07-15
 
 ### 🚀 Features

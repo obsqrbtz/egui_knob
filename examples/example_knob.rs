@@ -36,7 +36,7 @@ impl Default for KnobDemo {
 impl eframe::App for KnobDemo {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("🎛 egui-knob example");
+            ui.heading("egui-knob example");
             ui.separator();
 
             ui.horizontal(|ui| {

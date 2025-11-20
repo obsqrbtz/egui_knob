@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.6] - 2025-07-15
+
+### 🛠 Maintenance
+
+- cleaned up io a bit
+
 ## [0.3.5] - 2025-07-15
 
 ### 🛠 Maintenance

@@ -4,13 +4,13 @@ use egui_knob::{Knob, KnobStyle, LabelPosition};
 fn main() -> eframe::Result<()> {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([800.0, 600.0])
-            .with_title("egui_knob demo"),
+            .with_inner_size([600.0, 350.0])
+            .with_title("Knob demo"),
         ..Default::default()
     };
 
     eframe::run_native(
-        "egui_knob demo",
+        "Knob demo",
         options,
         Box::new(|_cc| Ok(Box::new(KnobDemo::default()))),
     )
@@ -43,7 +43,7 @@ impl Default for KnobDemo {
 impl eframe::App for KnobDemo {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("egui_knob demo");
+            ui.heading("Knob demo");
             ui.separator();
 
             ui.horizontal(|ui| {
@@ -82,7 +82,6 @@ impl eframe::App for KnobDemo {
                     .enumerate()
                     {
                         ui.vertical(|ui| {
-                            ui.label(*label);
                             let mut knob = Knob::new(&mut self.values[i], 0.0, 1.0, *config)
                                 .with_label(*label, LabelPosition::Bottom)
                                 .with_background_arc(self.show_bg_arc)

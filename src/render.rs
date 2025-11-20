@@ -32,10 +32,17 @@ impl<'a> KnobRenderer<'a> {
 
     pub fn render_knob(&self, painter: &Painter, center: Pos2, radius: f32, hovered: bool) {
         let knob_color = if hovered {
-            self.config.colors.knob_color.linear_multiply(1.2)
+            self.config.colors.knob_color.linear_multiply(1.15)
         } else {
             self.config.colors.knob_color
         };
+
+        // TODO: make an option
+        painter.circle_filled(
+            center,
+            radius - self.config.stroke_width / 2.0,
+            self.config.colors.knob_color.gamma_multiply(0.15),
+        );
 
         painter.circle_stroke(
             center,
@@ -50,11 +57,11 @@ impl<'a> KnobRenderer<'a> {
         let angle = self.compute_angle();
         match self.config.style {
             KnobStyle::Wiper => {
-                let pointer = center + Vec2::angled(angle) * (radius * 0.7);
+                let pointer = center + Vec2::angled(angle) * (radius * 0.65);
                 painter.line_segment(
                     [center, pointer],
                     Stroke::new(
-                        self.config.stroke_width * 1.5,
+                        self.config.stroke_width * 1.2,
                         self.config.colors.line_color,
                     ),
                 );
@@ -63,7 +70,7 @@ impl<'a> KnobRenderer<'a> {
                 let dot_pos = center + Vec2::angled(angle) * (radius * 0.7);
                 painter.circle_filled(
                     dot_pos,
-                    self.config.stroke_width * 1.5,
+                    self.config.stroke_width * 1.8,
                     self.config.colors.line_color,
                 );
             }
@@ -73,9 +80,9 @@ impl<'a> KnobRenderer<'a> {
     fn render_background_arc(&self, painter: &Painter, center: Pos2, radius: f32) {
         let arc_start = self.config.min_angle;
         let arc_end = self.config.max_angle;
-        let segments = 64;
-        let arc_color = self.config.colors.knob_color.gamma_multiply(0.5);
-        let arc_radius = radius * 0.8;
+        let segments = 128;
+        let arc_color = self.config.colors.knob_color.gamma_multiply(0.35);
+        let arc_radius = radius * 0.85;
 
         let mut points = Vec::with_capacity(segments + 1);
         for i in 0..=segments {
@@ -95,18 +102,23 @@ impl<'a> KnobRenderer<'a> {
                 * ((self.value - self.min) / (self.max - self.min)).clamp(0.0, 1.0))
                 as usize;
 
-            let mut fill_points = Vec::with_capacity(filled_segments + 1);
-            for i in 0..=filled_segments {
-                let t = i as f32 / segments as f32;
-                let angle = arc_start + (arc_end - arc_start) * t;
-                let pos = center + Vec2::angled(angle) * arc_radius;
-                fill_points.push(pos);
-            }
+            if filled_segments > 0 {
+                let mut fill_points = Vec::with_capacity(filled_segments + 1);
+                for i in 0..=filled_segments {
+                    let t = i as f32 / segments as f32;
+                    let angle = arc_start + (arc_end - arc_start) * t;
+                    let pos = center + Vec2::angled(angle) * arc_radius;
+                    fill_points.push(pos);
+                }
 
-            painter.add(egui::Shape::line(
-                fill_points,
-                Stroke::new(self.config.stroke_width, self.config.colors.line_color),
-            ));
+                painter.add(egui::Shape::line(
+                    fill_points,
+                    Stroke::new(
+                        self.config.stroke_width * 1.2,
+                        self.config.colors.line_color,
+                    ),
+                ));
+            }
         }
     }
 
@@ -114,26 +126,23 @@ impl<'a> KnobRenderer<'a> {
         if let Some(label) = &self.config.label {
             let label_text = format!("{}: {}", label, (self.config.label_format)(self.value));
             let font_id = egui::FontId::proportional(self.config.font_size);
-            let label_padding = 2.0;
+            let label_padding = 4.0;
 
             let (label_pos, alignment) = match self.config.label_position {
                 LabelPosition::Top => (
-                    Vec2::new(
-                        rect.center().x,
-                        rect.min.y - self.config.label_offset + label_padding,
-                    ),
+                    Vec2::new(rect.center().x, rect.min.y + label_padding),
                     Align2::CENTER_TOP,
                 ),
                 LabelPosition::Bottom => (
-                    Vec2::new(rect.center().x, rect.max.y + self.config.label_offset),
+                    Vec2::new(rect.center().x, rect.max.y - label_padding),
                     Align2::CENTER_BOTTOM,
                 ),
                 LabelPosition::Left => (
-                    Vec2::new(rect.min.x - self.config.label_offset, rect.center().y),
+                    Vec2::new(rect.min.x + label_padding, rect.center().y),
                     Align2::LEFT_CENTER,
                 ),
                 LabelPosition::Right => (
-                    Vec2::new(rect.max.x + self.config.label_offset, rect.center().y),
+                    Vec2::new(rect.max.x - label_padding, rect.center().y),
                     Align2::RIGHT_CENTER,
                 ),
             };
@@ -149,7 +158,7 @@ impl<'a> KnobRenderer<'a> {
     }
 
     pub fn calculate_size(&self, ui: &Ui) -> Vec2 {
-        let knob_size = Vec2::splat(self.config.size);
+        let knob_size = Vec2::splat(self.config.size + self.config.stroke_width * 2.0);
 
         let label_size = if let Some(label) = &self.config.label {
             let font_id = egui::FontId::proportional(self.config.font_size);
@@ -161,16 +170,16 @@ impl<'a> KnobRenderer<'a> {
             Vec2::ZERO
         };
 
-        let label_padding = 2.0;
+        let label_padding = 8.0;
 
         match self.config.label_position {
             LabelPosition::Top | LabelPosition::Bottom => Vec2::new(
                 knob_size.x.max(label_size.x + label_padding * 2.0),
-                knob_size.y + label_size.y + label_padding * 2.0 + self.config.label_offset,
+                knob_size.y + label_size.y + label_padding + self.config.label_offset,
             ),
             LabelPosition::Left | LabelPosition::Right => Vec2::new(
-                knob_size.x + label_size.x + label_padding * 2.0 + self.config.label_offset,
-                knob_size.y.max(label_size.y + label_padding * 2.0),
+                knob_size.x + label_size.x + label_padding + self.config.label_offset,
+                knob_size.y.max(label_size.y + label_padding),
             ),
         }
     }

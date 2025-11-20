@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.5] - 2025-07-15
+
+### 🛠 Maintenance
+
+- Restructured the project
+
+### 📚 Documentation
+
+- Updated readme, added contributing guidelines
+
 ## [0.3.4] - 2025-07-15
 
 ### 🛠 Maintenance

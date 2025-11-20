@@ -2,9 +2,16 @@ use eframe::egui;
 use egui_knob::{Knob, KnobStyle, LabelPosition};
 
 fn main() -> eframe::Result<()> {
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size([800.0, 600.0])
+            .with_title("egui_knob demo"),
+        ..Default::default()
+    };
+
     eframe::run_native(
         "egui_knob demo",
-        eframe::NativeOptions::default(),
+        options,
         Box::new(|_cc| Ok(Box::new(KnobDemo::default()))),
     )
 }
@@ -36,24 +43,27 @@ impl Default for KnobDemo {
 impl eframe::App for KnobDemo {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("egui-knob example");
+            ui.heading("egui_knob demo");
             ui.separator();
 
             ui.horizontal(|ui| {
-                ui.checkbox(&mut self.show_bg_arc, "Show background arc");
-                ui.checkbox(&mut self.show_filled, "Show filled segment");
-                ui.checkbox(&mut self.use_step, "Enable step (0.1)");
+                ui.label("Global Settings:");
+                ui.checkbox(&mut self.show_bg_arc, "Background arc");
+                ui.checkbox(&mut self.show_filled, "Filled segment");
+                ui.checkbox(&mut self.use_step, "Step (0.02)");
             });
 
             ui.horizontal(|ui| {
-                ui.label("Knob Colors:");
+                ui.label("Color Theme:");
                 ui.color_edit_button_srgba(&mut self.knob_color);
+                ui.label("Knob");
                 ui.color_edit_button_srgba(&mut self.line_color);
+                ui.label("Indicator");
                 ui.color_edit_button_srgba(&mut self.text_color);
+                ui.label("Text");
             });
 
             ui.separator();
-            ui.label("👇 Scroll or drag knobs to interact:");
 
             ui.add_space(10.0);
             egui::Grid::new("knob_grid")
@@ -78,7 +88,7 @@ impl eframe::App for KnobDemo {
                                 .with_background_arc(self.show_bg_arc)
                                 .with_show_filled_segments(self.show_filled)
                                 .with_colors(self.knob_color, self.line_color, self.text_color)
-                                .with_step(self.use_step.then_some(0.1));
+                                .with_step(self.use_step.then_some(0.02));
 
                             if *label == "Wiper, Sweep" {
                                 knob = knob.with_sweep_range(0.25, 0.75).with_size(50.0);

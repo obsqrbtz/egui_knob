@@ -1,2 +1,14 @@
+# Rust
 /target
 /examples/target
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

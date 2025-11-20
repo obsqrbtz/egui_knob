@@ -1,10 +1,12 @@
 [package]
 name = "egui_knob"
-version = "0.3.4"
+version = "0.3.5"
 edition = "2024"
+authors = ["Daniel Dada"]
 description = "A simple knob widget for egui"
 homepage = "https://github.com/obsqrbtz/egui_knob"
 repository = "https://github.com/obsqrbtz/egui_knob"
+documentation = "https://docs.rs/egui_knob"
 readme = "README.md"
 license = "MIT"
 keywords = ["egui", "ui", "widget", "knob", "range"]

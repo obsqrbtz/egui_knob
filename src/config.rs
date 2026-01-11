@@ -16,6 +16,7 @@ pub struct KnobConfig {
     pub(crate) show_filled_segments: bool,
     pub(crate) min_angle: f32,
     pub(crate) max_angle: f32,
+    pub(crate) reset_value: Option<f32>,
 }
 
 impl KnobConfig {
@@ -36,6 +37,7 @@ impl KnobConfig {
             drag_sensitivity: 0.005,
             show_background_arc: true,
             show_filled_segments: true,
+            reset_value: None,
         }
     }
 }

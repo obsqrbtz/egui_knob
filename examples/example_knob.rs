@@ -87,7 +87,8 @@ impl eframe::App for KnobDemo {
                                 .with_background_arc(self.show_bg_arc)
                                 .with_show_filled_segments(self.show_filled)
                                 .with_colors(self.knob_color, self.line_color, self.text_color)
-                                .with_step(self.use_step.then_some(0.02));
+                                .with_step(self.use_step.then_some(0.02))
+                                .with_double_click_reset(0.5);
 
                             if *label == "Wiper, Sweep" {
                                 knob = knob.with_sweep_range(0.25, 0.75).with_size(50.0);

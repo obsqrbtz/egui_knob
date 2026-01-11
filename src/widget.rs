@@ -53,7 +53,7 @@ impl<'a> Knob<'a> {
             return self;
         }
 
-        self.config.min_angle =
+        self.config.min_angle = 
             start_angle_normalized.rem_euclid(1.0) * std::f32::consts::TAU + std::f32::consts::PI / 2.0;
         self.config.max_angle = self.config.min_angle + range.max(0.0) * std::f32::consts::TAU;
         self
@@ -156,6 +156,13 @@ impl<'a> Knob<'a> {
         self
     }
 
+    /// Sets a reset value to return to on doubleclick event.
+    ///
+    /// Default is 0.005.
+    pub fn with_double_click_reset(mut self, reset_value: f32) -> Self {
+        self.config.reset_value = Some(reset_value);
+        self
+    }
 }
 
 impl Widget for Knob<'_> {
@@ -168,7 +175,7 @@ impl Widget for Knob<'_> {
         let renderer = KnobRenderer::new(&self.config, current_value, self.min, self.max);
         let adjusted_size = renderer.calculate_size(ui);
 
-        let (rect, response) = ui.allocate_exact_size(adjusted_size, Sense::drag());
+        let (rect, response) = ui.allocate_exact_size(adjusted_size, Sense::click_and_drag());
 
         let mut response = response;
         if response.dragged() {
@@ -189,6 +196,10 @@ impl Widget for Knob<'_> {
             }
 
             response.mark_changed();
+        } else if response.double_clicked() {
+            if let Some(reset_value) = self.config.reset_value {
+                *self.value = reset_value
+            }
         }
 
         let knob_rect = renderer.calculate_knob_rect(rect);

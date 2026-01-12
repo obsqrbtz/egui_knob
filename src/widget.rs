@@ -157,8 +157,6 @@ impl<'a> Knob<'a> {
     }
 
     /// Sets a reset value to return to on doubleclick event.
-    ///
-    /// Default is 0.005.
     pub fn with_double_click_reset(mut self, reset_value: f32) -> Self {
         self.config.reset_value = Some(reset_value);
         self

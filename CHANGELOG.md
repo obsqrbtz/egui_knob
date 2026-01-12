@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.8] - 2026-01-12
+
+### 🚀 Features
+
+- added `with_double_click_reset` option ([#PR6](https://github.com/obsqrbtz/egui_knob/pull/6) by [maor1993](https://github.com/maor1993))
+
 ## [0.3.7] - 2026-01-06
 
 ### 🛠 Maintenance

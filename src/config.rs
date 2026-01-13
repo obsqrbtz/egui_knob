@@ -17,6 +17,7 @@ pub struct KnobConfig {
     pub(crate) min_angle: f32,
     pub(crate) max_angle: f32,
     pub(crate) reset_value: Option<f32>,
+    pub(crate) allow_scroll: bool,
 }
 
 impl KnobConfig {
@@ -38,6 +39,7 @@ impl KnobConfig {
             show_background_arc: true,
             show_filled_segments: true,
             reset_value: None,
+            allow_scroll:false
         }
     }
 }

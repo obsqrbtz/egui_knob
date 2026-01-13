@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.9] - 2026-01-13
+
+### 🚀 Features
+
+- added support for using mouse scroll wheel to change values ([#PR7](https://github.com/obsqrbtz/egui_knob/pull/7) by [maor1993](https://github.com/maor1993))
+
 ## [0.3.8] - 2026-01-12
 
 ### 🚀 Features

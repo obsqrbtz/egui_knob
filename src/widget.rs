@@ -161,6 +161,13 @@ impl<'a> Knob<'a> {
         self.config.reset_value = Some(reset_value);
         self
     }
+
+    /// Allows user to use scroll wheel to change knob value
+    /// Uses config.step for the increment value
+    pub fn with_middle_scroll(mut self) -> Self {
+        self.config.allow_scroll = true;
+        self
+    }
 }
 
 impl Widget for Knob<'_> {
@@ -197,6 +204,17 @@ impl Widget for Knob<'_> {
         } else if response.double_clicked() {
             if let Some(reset_value) = self.config.reset_value {
                 *self.value = reset_value
+            }
+        } else if response.hovered() & self.config.allow_scroll {
+            if let Some(scoll) = ui.input(|input| {
+                input.events.iter().find_map(|e| match e {
+                    egui::Event::MouseWheel { delta, .. } => Some(*delta),
+                    _ => None,
+                })
+            }) {
+                *self.value = (*self.value
+                    + scoll.y * self.config.step.unwrap_or(self.config.drag_sensitivity))
+                .clamp(self.min, self.max);
             }
         }
 

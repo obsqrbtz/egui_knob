@@ -175,7 +175,7 @@ impl<'a> Knob<'a> {
 }
 
 impl Widget for Knob<'_> {
-    fn ui(mut self, ui: &mut Ui) -> Response {
+    fn ui(self, ui: &mut Ui) -> Response {
         if self.value.is_nan() {
             *self.value = self.min;
         }

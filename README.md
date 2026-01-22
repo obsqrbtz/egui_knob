@@ -18,6 +18,7 @@ A simple, customizable knob widget for egui.
 - Configurable sweep range
 - Background arc with filled segments
 - Adjustable drag sensitivity
+- Logarithmic scaling
 
 ## Installation
 
@@ -102,6 +103,13 @@ Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
 // Display as percentage
 Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
     .with_label_format(|v| format!("{:.0}%", v * 100.0));
+```
+
+#### Logarithmic Knobs
+```rust
+// Display as percentage
+Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
+    .with_logarithmic_scaling(true);
 ```
 
 ## Running demo app

@@ -82,7 +82,7 @@ impl eframe::App for KnobDemo {
                     .enumerate()
                     {
                         ui.vertical(|ui| {
-                            let mut knob = Knob::new(&mut self.values[i], 0.0, 1.0, *config)
+                            let mut knob = Knob::new(&mut self.values[i], 0., 3., *config)
                                 .with_label(*label, LabelPosition::Bottom)
                                 .with_background_arc(self.show_bg_arc)
                                 .with_show_filled_segments(self.show_filled)
@@ -90,6 +90,7 @@ impl eframe::App for KnobDemo {
                                 .with_step(self.use_step.then_some(0.02))
                                 .with_double_click_reset(0.5)
                                 .with_middle_scroll();
+                                //.with_logarithmic_scaling();
 
                             if *label == "Wiper, Sweep" {
                                 knob = knob.with_sweep_range(0.25, 0.75).with_size(50.0);

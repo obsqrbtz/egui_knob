@@ -6,27 +6,28 @@ use crate::style::{KnobStyle, LabelPosition};
 pub(crate) struct KnobRenderer<'a> {
     config: &'a KnobConfig,
     value: f32,
+    raw: f32,
     min: f32,
     max: f32,
 }
 
 impl<'a> KnobRenderer<'a> {
-    pub fn new(config: &'a KnobConfig, value: f32, min: f32, max: f32) -> Self {
+    pub fn new(config: &'a KnobConfig, value: f32, raw: f32, min: f32, max: f32) -> Self {
         Self {
             config,
             value,
+            raw,
             min,
             max,
         }
     }
 
     pub fn compute_angle(&self) -> f32 {
-        if self.min == self.max || self.value.is_nan() {
+        if self.min == self.max || self.raw.is_nan() {
             self.config.min_angle
         } else {
             self.config.min_angle
-                + (self.value - self.min) / (self.max - self.min)
-                    * (self.config.max_angle - self.config.min_angle)
+                + self.raw * (self.config.max_angle - self.config.min_angle)
         }
     }
 
@@ -99,7 +100,7 @@ impl<'a> KnobRenderer<'a> {
 
         if self.config.show_filled_segments {
             let filled_segments = (segments as f32
-                * ((self.value - self.min) / (self.max - self.min)).clamp(0.0, 1.0))
+                * self.raw.clamp(0.0, 1.0))
                 as usize;
 
             if filled_segments > 0 {

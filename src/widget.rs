@@ -194,20 +194,19 @@ impl Widget for Knob<'_> {
         let mut response = response;
         if response.dragged() {
             let delta = response.drag_delta().y;
-            let range = 1.0;
-            let step = self.config.step.unwrap_or(range * self.config.drag_sensitivity);
+            let step = self.config.step.unwrap_or(self.config.drag_sensitivity);
             raw = (raw - delta * step).clamp(0.0,1.0);
 
-            /*raw = if let Some(step) = self.config.step {
-                let steps = ((raw - 1.0) / step).round();
-                (steps * step).clamp(1.0, 2.0)
+            raw = if let Some(step) = self.config.step {
+                let steps = (raw / step).round();
+                (steps * step).clamp(0.0, 1.0)
             } else {
                 raw
-            };*/
+            };
 
-            /*if self.value.is_nan() {
+            if self.value.is_nan() {
                 *self.value = 0.0;
-            }*/
+            }
 
             response.mark_changed();
         }  else if response.hovered() & self.config.allow_scroll {

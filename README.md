@@ -107,9 +107,9 @@ Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
 
 #### Logarithmic Knobs
 ```rust
-// Display as percentage
+// Enable logarithmic scaling
 Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
-    .with_logarithmic_scaling(true);
+    .with_logarithmic_scaling();
 ```
 
 ## Running demo app

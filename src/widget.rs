@@ -1,4 +1,4 @@
-use egui::{Color32, Response, Sense, Ui, Widget};
+use egui::{remap, Color32, Response, Sense, Ui, Widget};
 
 use crate::config::KnobConfig;
 use crate::render::KnobRenderer;
@@ -168,6 +168,10 @@ impl<'a> Knob<'a> {
         self.config.allow_scroll = true;
         self
     }
+    pub fn with_logarithmic_scaling(mut self) -> Self {
+        self.config.logarithmic_scaling = true;
+        self
+    }
 }
 
 impl Widget for Knob<'_> {
@@ -176,8 +180,13 @@ impl Widget for Knob<'_> {
             *self.value = self.min;
         }
 
-        let current_value = *self.value;
-        let renderer = KnobRenderer::new(&self.config, current_value, self.min, self.max);
+        let mut raw = if self.config.logarithmic_scaling {
+            remap(*self.value, self.min..=self.max, 1.0..=10.0).log(10.0)
+        } else {
+            remap(*self.value, self.min..=self.max, 0.0..=1.0)
+        };
+
+        let renderer = KnobRenderer::new(&self.config, *self.value, raw, self.min, self.max);
         let adjusted_size = renderer.calculate_size(ui);
 
         let (rect, response) = ui.allocate_exact_size(adjusted_size, Sense::click_and_drag());
@@ -185,36 +194,43 @@ impl Widget for Knob<'_> {
         let mut response = response;
         if response.dragged() {
             let delta = response.drag_delta().y;
-            let range = self.max - self.min;
-            let step = self.config.step.unwrap_or(range * self.config.drag_sensitivity);
-            let new_value = (*self.value - delta * step).clamp(self.min, self.max);
+            let step = self.config.step.unwrap_or(self.config.drag_sensitivity);
+            raw = (raw - delta * step).clamp(0.0,1.0);
 
-            *self.value = if let Some(step) = self.config.step {
-                let steps = ((new_value - self.min) / step).round();
-                (self.min + steps * step).clamp(self.min, self.max)
+            raw = if let Some(step) = self.config.step {
+                let steps = (raw / step).round();
+                (steps * step).clamp(0.0, 1.0)
             } else {
-                new_value
+                raw
             };
 
             if self.value.is_nan() {
-                *self.value = self.min;
+                *self.value = 0.0;
             }
 
             response.mark_changed();
-        } else if response.double_clicked() {
-            if let Some(reset_value) = self.config.reset_value {
-                *self.value = reset_value
-            }
-        } else if response.hovered() & self.config.allow_scroll {
+        }  else if response.hovered() & self.config.allow_scroll {
             if let Some(scoll) = ui.input(|input| {
                 input.events.iter().find_map(|e| match e {
                     egui::Event::MouseWheel { delta, .. } => Some(*delta),
                     _ => None,
                 })
             }) {
-                *self.value = (*self.value
+                raw = (raw
                     + scoll.y * self.config.step.unwrap_or(self.config.drag_sensitivity))
-                .clamp(self.min, self.max);
+                .clamp(0.0, 1.0);
+            }
+        }
+
+        *self.value = if self.config.logarithmic_scaling {
+            remap(10f32.powf(raw), 1.0..=10.0, self.min..=self.max)
+        }else {
+            remap(raw, 0.0..=1.0, self.min..=self.max)
+        };
+
+        if response.double_clicked() {
+            if let Some(reset_value) = self.config.reset_value {
+                *self.value = reset_value
             }
         }
 
@@ -222,8 +238,7 @@ impl Widget for Knob<'_> {
         let center = knob_rect.center();
         let radius = self.config.size / 2.0;
 
-        let updated_value = *self.value;
-        let updated_renderer = KnobRenderer::new(&self.config, updated_value, self.min, self.max);
+        let updated_renderer = KnobRenderer::new(&self.config, *self.value, raw, self.min, self.max);
         updated_renderer.render_knob(ui.painter(), center, radius, response.hovered());
         updated_renderer.render_label(ui, rect);
 

@@ -21,6 +21,7 @@ struct KnobDemo {
     show_bg_arc: bool,
     show_filled: bool,
     use_step: bool,
+    logarithmic_scaling: bool,
     knob_color: egui::Color32,
     line_color: egui::Color32,
     text_color: egui::Color32,
@@ -33,6 +34,7 @@ impl Default for KnobDemo {
             show_bg_arc: true,
             show_filled: true,
             use_step: false,
+            logarithmic_scaling: false,
             knob_color: egui::Color32::DARK_GRAY,
             line_color: egui::Color32::LIGHT_BLUE,
             text_color: egui::Color32::WHITE,
@@ -51,6 +53,8 @@ impl eframe::App for KnobDemo {
                 ui.checkbox(&mut self.show_bg_arc, "Background arc");
                 ui.checkbox(&mut self.show_filled, "Filled segment");
                 ui.checkbox(&mut self.use_step, "Step (0.02)");
+                ui.checkbox(&mut self.logarithmic_scaling, "Logarithmic");
+
             });
 
             ui.horizontal(|ui| {
@@ -82,7 +86,7 @@ impl eframe::App for KnobDemo {
                     .enumerate()
                     {
                         ui.vertical(|ui| {
-                            let mut knob = Knob::new(&mut self.values[i], 0.0, 1.0, *config)
+                            let mut knob = Knob::new(&mut self.values[i], 0., 1., *config)
                                 .with_label(*label, LabelPosition::Bottom)
                                 .with_background_arc(self.show_bg_arc)
                                 .with_show_filled_segments(self.show_filled)
@@ -90,6 +94,10 @@ impl eframe::App for KnobDemo {
                                 .with_step(self.use_step.then_some(0.02))
                                 .with_double_click_reset(0.5)
                                 .with_middle_scroll();
+
+                            if self.logarithmic_scaling {
+                                knob = knob.with_logarithmic_scaling();
+                            }
 
                             if *label == "Wiper, Sweep" {
                                 knob = knob.with_sweep_range(0.25, 0.75).with_size(50.0);

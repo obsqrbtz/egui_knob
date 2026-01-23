@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.10] - 2026-01-23
+
+### 🚀 Features
+
+- added support for logarithmic scaling ([#PR9](https://github.com/obsqrbtz/egui_knob/pull/9) by [bratorange](https://github.com/bratorange))
+
 ## [0.3.9] - 2026-01-13
 
 ### 🚀 Features

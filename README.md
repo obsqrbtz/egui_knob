@@ -28,7 +28,7 @@ To use the Knob widget in your project, add the following to your `Cargo.toml`:
 [dependencies]
 egui = "0.33"
 eframe = "0.33"
-egui_knob = "0.3.9"
+egui_knob = "0.3.10"
 ```
 
 ## Usage

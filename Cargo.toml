@@ -1,6 +1,6 @@
 [package]
 name = "egui_knob"
-version = "0.3.9"
+version = "0.3.10"
 edition = "2024"
 authors = ["Daniel Dada"]
 description = "A simple knob widget for egui"

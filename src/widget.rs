@@ -209,17 +209,15 @@ impl Widget for Knob<'_> {
             }
 
             response.mark_changed();
-        }  else if response.hovered() & self.config.allow_scroll {
-            if let Some(scoll) = ui.input(|input| {
+        }  else if response.hovered() & self.config.allow_scroll && let Some(scoll) = ui.input(|input| {
                 input.events.iter().find_map(|e| match e {
                     egui::Event::MouseWheel { delta, .. } => Some(*delta),
                     _ => None,
                 })
             }) {
-                raw = (raw
-                    + scoll.y * self.config.step.unwrap_or(self.config.drag_sensitivity))
-                .clamp(0.0, 1.0);
-            }
+            raw = (raw
+                + scoll.y * self.config.step.unwrap_or(self.config.drag_sensitivity))
+            .clamp(0.0, 1.0);
         }
 
         *self.value = if self.config.logarithmic_scaling {
@@ -228,11 +226,10 @@ impl Widget for Knob<'_> {
             remap(raw, 0.0..=1.0, self.min..=self.max)
         };
 
-        if response.double_clicked() {
-            if let Some(reset_value) = self.config.reset_value {
+        if response.double_clicked()
+            && let Some(reset_value) = self.config.reset_value {
                 *self.value = reset_value
             }
-        }
 
         let knob_rect = renderer.calculate_knob_rect(rect);
         let center = knob_rect.center();

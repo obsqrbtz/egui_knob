@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.11] - 2026-03-30
+
+- bumped egui version ([#PR10](https://github.com/obsqrbtz/egui_knob/pull/10) by [elwerene](https://github.com/elwerene)
+
+### 🛠 Maintenance
+
 ## [0.3.10] - 2026-01-23
 
 ### 🚀 Features

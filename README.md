@@ -36,8 +36,8 @@ egui_knob = "0.3.11"
 ### Basic Example
 
 ```rust
-use egui_knob::{Knob, KnobStyle, LabelPosition};
 use eframe::egui;
+use egui_knob::{Knob, KnobStyle, LabelPosition};
 
 struct KnobApp {
     value: f32,
@@ -50,17 +50,19 @@ impl Default for KnobApp {
 }
 
 impl eframe::App for KnobApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            let knob = Knob::new(&mut self.value, 0.0, 1.0, KnobStyle::Wiper)
-                .with_size(50.0)
-                .with_font_size(14.0)
-                .with_colors(egui::Color32::GRAY, egui::Color32::WHITE, egui::Color32::WHITE)
-                .with_stroke_width(3.0)
-                .with_label("Volume", LabelPosition::Top);
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        let knob = Knob::new(&mut self.value, 0.0, 1.0, KnobStyle::Wiper)
+            .with_size(50.0)
+            .with_font_size(14.0)
+            .with_colors(
+                egui::Color32::GRAY,
+                egui::Color32::WHITE,
+                egui::Color32::WHITE,
+            )
+            .with_stroke_width(3.0)
+            .with_label("Volume", LabelPosition::Top);
 
-            ui.add(knob);
-        });
+        ui.add(knob);
     }
 }
 

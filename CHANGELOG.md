@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.13] - 2026-03-30
+
+- call publish from version workflow
+
 ## [0.3.12] - 2026-03-30
 
 - updated docs ([#PR11](https://github.com/obsqrbtz/egui_knob/pull/11) by [anton-k](https://github.com/anton-k)

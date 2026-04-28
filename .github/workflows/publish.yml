@@ -4,16 +4,19 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_call:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-      
+
       - name: Check if version matches tag
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
@@ -22,6 +25,6 @@ jobs:
             echo "Tag version ($TAG) doesn't match Cargo.toml version ($CARGO_VERSION)"
             exit 1
           fi
-      
+
       - name: Publish to crates.io
         run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}

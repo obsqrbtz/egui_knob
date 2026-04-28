@@ -1,0 +1,25 @@
+name: Build
+
+on:
+  push:
+    branches: [ci_test]
+  pull_request:
+    branches: [ci_test]
+
+jobs:
+  build:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build library
+        run: cargo build --locked
+
+      - name: Build examples
+        run: cargo build --examples --locked

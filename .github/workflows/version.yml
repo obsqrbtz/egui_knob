@@ -1,4 +1,4 @@
-name: Version sync
+name: Version Sync
 
 on:
   workflow_run:

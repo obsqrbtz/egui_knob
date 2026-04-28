@@ -25,10 +25,15 @@ A simple, customizable knob widget for egui.
 To use the Knob widget in your project, add the following to your `Cargo.toml`:
 
 ```toml
+[package]
+name = "someapp"
+version = "0.1.0"
+edition = "2024"
+
 [dependencies]
-egui = "0.33"
-eframe = "0.33"
+egui = "0.34"
 egui_knob = "0.3.11"
+eframe = "0.34"
 ```
 
 ## Usage

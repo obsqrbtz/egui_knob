@@ -73,7 +73,7 @@ impl eframe::App for KnobDemo {
             .spacing([30.0, 20.0])
             .show(ui, |ui| {
                 for (i, (label, config)) in [
-                    ("Basic Dot", KnobStyle::Dot),
+                    ("Custom Fill", KnobStyle::Dot),
                     ("Wiper, Sweep", KnobStyle::Wiper),
                     ("Thick Stroke", KnobStyle::Wiper),
                     ("360° Sweep", KnobStyle::Wiper),
@@ -88,7 +88,9 @@ impl eframe::App for KnobDemo {
                             .with_label(*label, LabelPosition::Bottom)
                             .with_background_arc(self.show_bg_arc)
                             .with_show_filled_segments(self.show_filled)
-                            .with_colors(self.knob_color, self.line_color, self.text_color)
+                            .with_knob_color(self.knob_color)
+                            .with_line_color(self.line_color)
+                            .with_text_color(self.text_color)
                             .with_step(self.use_step.then_some(0.02))
                             .with_double_click_reset(0.5)
                             .with_middle_scroll();
@@ -97,6 +99,9 @@ impl eframe::App for KnobDemo {
                             knob = knob.with_logarithmic_scaling();
                         }
 
+                        if *label == "Custom Fill" {
+                            knob = knob.with_fill_color(egui::Color32::from_rgb(35, 55, 85));
+                        }
                         if *label == "Wiper, Sweep" {
                             knob = knob.with_sweep_range(0.25, 0.75).with_size(50.0);
                         }

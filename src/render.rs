@@ -38,12 +38,13 @@ impl<'a> KnobRenderer<'a> {
             self.config.colors.knob_color
         };
 
-        // TODO: make an option
-        painter.circle_filled(
-            center,
-            radius - self.config.stroke_width / 2.0,
-            self.config.colors.fill_color,
-        );
+        let fill_color = if self.config.colors.fill_color == Color32::PLACEHOLDER {
+            self.config.colors.knob_color.gamma_multiply(0.15)
+        } else {
+            self.config.colors.fill_color
+        };
+
+        painter.circle_filled(center, radius - self.config.stroke_width / 2.0, fill_color);
 
         painter.circle_stroke(
             center,

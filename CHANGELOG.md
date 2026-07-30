@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-07-30
+
+### 🚀 Features
+
+- added `with_fill_color` to set the knob's fill color ([#PR20](https://github.com/obsqrbtz/egui_knob/pull/20) by [Jeremy-Stafford](https://github.com/Jeremy-Stafford))
+- split `with_colors` into `with_knob_color`, `with_line_color` and `with_text_color`
+
+### ⚠️ Deprecations
+
+- `with_colors` is deprecated in favour of the per-color setters. It still compiles and renders
+  identically, so no visual or source changes are required; builds that deny warnings will need
+  to move to the new setters.
+
+### 📚 Documentation
+
+- documented the fill color in the readme and demoed it on one knob in the example app
+
 ## [0.3.13] - 2026-03-30
 
 - call publish from version workflow

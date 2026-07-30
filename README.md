@@ -11,7 +11,7 @@ A simple, customizable knob widget for egui.
 ## Features
 
 - Adjustable size, font size, and stroke width
-- Customizable colors for the knob, indicator, and text
+- Customizable colors for the knob outline, fill, indicator, and text
 - Label positions (Top, Bottom, Left, Right)
 - Custom label formatting
 - Two visual styles: Wiper and Dot
@@ -59,11 +59,10 @@ impl eframe::App for KnobApp {
         let knob = Knob::new(&mut self.value, 0.0, 1.0, KnobStyle::Wiper)
             .with_size(50.0)
             .with_font_size(14.0)
-            .with_colors(
-                egui::Color32::GRAY,
-                egui::Color32::WHITE,
-                egui::Color32::WHITE,
-            )
+            .with_knob_color(egui::Color32::GRAY)
+            .with_fill_color(egui::Color32::from_rgb(35, 55, 85))
+            .with_line_color(egui::Color32::WHITE)
+            .with_text_color(egui::Color32::WHITE)
             .with_stroke_width(3.0)
             .with_label("Volume", LabelPosition::Top);
 
@@ -95,6 +94,15 @@ Knob::new(&mut value, 0.0, 100.0, KnobStyle::Wiper)
 // 2.5 full rotations
 Knob::new(&mut value, 0.0, 1.0, KnobStyle::Dot)
     .with_sweep_range(0.0, 2.5);
+```
+
+#### Custom Fill Color
+```rust
+// By default the fill is derived from the knob color.
+// Set it explicitly to decouple the two:
+Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
+    .with_knob_color(egui::Color32::LIGHT_BLUE)
+    .with_fill_color(egui::Color32::from_rgb(35, 55, 85));
 ```
 
 #### Stepped Values

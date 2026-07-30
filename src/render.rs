@@ -42,7 +42,7 @@ impl<'a> KnobRenderer<'a> {
         painter.circle_filled(
             center,
             radius - self.config.stroke_width / 2.0,
-            self.config.colors.knob_color.gamma_multiply(0.15),
+            self.config.colors.fill_color,
         );
 
         painter.circle_stroke(

@@ -83,6 +83,9 @@ impl<'a> Knob<'a> {
     /// * `knob_color` - Color of the knob's outline
     /// * `line_color` - Color of the indicator
     /// * `text_color` - Color of the label text
+    ///
+    /// Note that this method sets the fill color to `knob_color` with 15% gamma.
+    /// Use [`Self::with_fill_color`] (after calling this method) to set the fill color.
     pub fn with_colors(
         mut self,
         knob_color: Color32,
@@ -90,8 +93,18 @@ impl<'a> Knob<'a> {
         text_color: Color32,
     ) -> Self {
         self.config.colors.knob_color = knob_color;
+        self.config.colors.fill_color = knob_color.gamma_multiply(0.15);
         self.config.colors.line_color = line_color;
         self.config.colors.text_color = text_color;
+        self
+    }
+
+    /// Sets the fill color of the knob
+    ///
+    /// # Arguments
+    /// * `fill_color` - Color of the knob's fill
+    pub fn with_fill_color(mut self, fill_color: Color32) -> Self {
+        self.config.colors.fill_color = fill_color;
         self
     }
 

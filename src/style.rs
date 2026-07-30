@@ -27,6 +27,8 @@ pub enum LabelPosition {
 pub struct KnobColors {
     /// Color of the knob's outline
     pub knob_color: Color32,
+    /// Color of the knob's fill
+    pub fill_color: Color32,
     /// Color of the indicator (wiper or dot)
     pub line_color: Color32,
     /// Color of the label text
@@ -37,6 +39,7 @@ impl Default for KnobColors {
     fn default() -> Self {
         Self {
             knob_color: Color32::GRAY,
+            fill_color: Color32::GRAY.gamma_multiply(0.15),
             line_color: Color32::GRAY,
             text_color: Color32::WHITE,
         }

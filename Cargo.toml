@@ -1,7 +1,8 @@
 [package]
 name = "egui_knob"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2024"
+rust-version = "1.95"
 authors = ["Daniel Dada"]
 description = "A simple knob widget for egui"
 homepage = "https://github.com/obsqrbtz/egui_knob"
@@ -21,7 +22,7 @@ name = "example_knob"
 path = "examples/example_knob.rs"
 
 [dependencies]
-egui = "0.35"
+egui = "0.36"
 
 [dev-dependencies]
-eframe = { version = "0.35", features = ["default_fonts"] }
+eframe = { version = "0.36", features = ["default_fonts"] }

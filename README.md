@@ -32,7 +32,7 @@ edition = "2024"
 
 [dependencies]
 egui = "0.36"
-egui_knob = "0.4.0"
+egui_knob = "0.5.0"
 eframe = "0.36"
 ```
 

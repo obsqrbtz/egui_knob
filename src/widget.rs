@@ -161,7 +161,7 @@ impl<'a> Knob<'a> {
     }
 
     /// Calculates a normalized step size which corresponds to a true step in the min/max values
-    pub fn with_step_unormalized(mut self, step: f32) -> Self {
+    pub fn with_step_unnormalized(mut self, step: f32) -> Self {
         let step = step/(self.max-self.min);
 
         if step >= 1.0 || step <= 0.0{

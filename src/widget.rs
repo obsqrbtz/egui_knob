@@ -160,6 +160,19 @@ impl<'a> Knob<'a> {
         self
     }
 
+    /// Calculates a normalized step size which corresponds to a true step in the min/max values
+    pub fn with_step_unormalized(mut self, step: f32) -> Self {
+        let step = step/(self.max-self.min);
+
+        if step >= 1.0 || step <= 0.0{
+            panic!("step value requested is out of valid range")
+        }
+
+        self.config.step = Some(step);
+        self        
+
+    }
+
     /// Controls whether to show the background arc indicating the full range
     pub fn with_background_arc(mut self, enabled: bool) -> Self {
         self.config.show_background_arc = enabled;

@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - `with_step` takes the step in `min`/`max` units again, as it did before adding logarithmic scale (reported by [maor1993](https://github.com/maor1993) in
   [#PR23](https://github.com/obsqrbtz/egui_knob/pull/23))
-- scrolling snaps to `step`
+- each wheel event moves to the neighbouring `step`
 - non-finite and non-positive steps are ignored instead of corrupting the value.
 
 ### ⚠️ Breaking changes

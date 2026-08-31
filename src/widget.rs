@@ -191,7 +191,7 @@ impl<'a> Knob<'a> {
     }
 
     /// Allows user to use scroll wheel to change knob value
-    /// Uses config.drag_sensitivity for the increment value
+    /// Moves one `step` per wheel event, or scales by config.drag_sensitivity if no step is set
     pub fn with_middle_scroll(mut self) -> Self {
         self.config.allow_scroll = true;
         self
@@ -218,6 +218,17 @@ fn raw_to_value(raw: f32, min: f32, max: f32, logarithmic: bool) -> f32 {
     }
 }
 
+fn snap_to_step(value: f32, min: f32, max: f32, step: Option<f32>) -> f32 {
+    match step {
+        Some(step) if step.is_finite() && step > 0.0 => {
+            let steps = ((value - min) / step).round();
+            let (lo, hi) = (min.min(max), min.max(max));
+            (min + steps * step).max(lo).min(hi)
+        }
+        _ => value,
+    }
+}
+
 impl Widget for Knob<'_> {
     fn ui(self, ui: &mut Ui) -> Response {
         if self.value.is_nan() {
@@ -225,6 +236,8 @@ impl Widget for Knob<'_> {
         }
 
         let logarithmic = self.config.logarithmic_scaling;
+        let (min, max, step) = (self.min, self.max, self.config.step);
+        let previous = *self.value;
         let mut raw = value_to_raw(*self.value, self.min, self.max, logarithmic);
 
         let renderer = KnobRenderer::new(&self.config, *self.value, raw, self.min, self.max);
@@ -234,46 +247,58 @@ impl Widget for Knob<'_> {
 
         let mut response = response;
         let mut moved = false;
-        if response.dragged() {
-            let base = ui
-                .ctx()
-                .data(|data| data.get_temp::<f32>(response.id))
-                .unwrap_or(raw);
-            raw = (base - response.drag_delta().y * self.config.drag_sensitivity).clamp(0.0, 1.0);
-            ui.ctx().data_mut(|data| data.insert_temp(response.id, raw));
 
+        let base = ui
+            .ctx()
+            .data(|data| data.get_temp::<f32>(response.id))
+            .filter(|prev| {
+                snap_to_step(raw_to_value(*prev, min, max, logarithmic), min, max, step) == previous
+            })
+            .unwrap_or(raw);
+
+        if response.dragged() {
+            raw = (base - response.drag_delta().y * self.config.drag_sensitivity).clamp(0.0, 1.0);
             moved = true;
-            response.mark_changed();
         }  else if response.hovered() & self.config.allow_scroll && let Some(scoll) = ui.input(|input| {
                 input.events.iter().find_map(|e| match e {
-                    egui::Event::MouseWheel { delta, .. } => Some(*delta),
+                    egui::Event::MouseWheel { delta, .. } if delta.y != 0.0 => Some(*delta),
                     _ => None,
                 })
             }) {
-            raw = (raw + scoll.y * self.config.drag_sensitivity).clamp(0.0, 1.0);
+            raw = match step.filter(|step| step.is_finite() && *step > 0.0) {
+                Some(step) => {
+                    let index = (*self.value - min) / step;
+                    let next = if snap_to_step(*self.value, min, max, Some(step)) == *self.value {
+                        index.round() + scoll.y.signum()
+                    } else if scoll.y > 0.0 {
+                        index.ceil()
+                    } else {
+                        index.floor()
+                    };
+                    value_to_raw(min + next * step, min, max, logarithmic).clamp(0.0, 1.0)
+                }
+                None => (base + scoll.y * self.config.drag_sensitivity).clamp(0.0, 1.0),
+            };
             moved = true;
+        }
+
+        if moved {
+            ui.ctx().data_mut(|data| data.insert_temp(response.id, raw));
+            *self.value = snap_to_step(raw_to_value(raw, min, max, logarithmic), min, max, step);
         }
 
         if response.drag_stopped() {
             ui.ctx().data_mut(|data| data.remove::<f32>(response.id));
         }
 
-        *self.value = raw_to_value(raw, self.min, self.max, logarithmic);
-
-        if moved
-            && let Some(step) = self.config.step
-            && step.is_finite()
-            && step > 0.0
-        {
-            let steps = ((*self.value - self.min) / step).round();
-            let (lo, hi) = (self.min.min(self.max), self.min.max(self.max));
-            *self.value = (self.min + steps * step).max(lo).min(hi);
-        }
-
         if response.double_clicked()
             && let Some(reset_value) = self.config.reset_value {
                 *self.value = reset_value
             }
+
+        if *self.value != previous {
+            response.mark_changed();
+        }
 
         let raw = value_to_raw(*self.value, self.min, self.max, logarithmic).clamp(0.0, 1.0);
 

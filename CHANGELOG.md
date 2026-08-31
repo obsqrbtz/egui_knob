@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
   [#PR23](https://github.com/obsqrbtz/egui_knob/pull/23))
 - each wheel event moves to the neighbouring `step`
 - non-finite and non-positive steps are ignored instead of corrupting the value.
+- `guarded min == max` case
+- a knob with `with_middle_scroll` takes the wheel while hovered
 
 ### ⚠️ Breaking changes
 

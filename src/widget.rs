@@ -286,6 +286,11 @@ impl Widget for Knob<'_> {
             moved = true;
         }
 
+        // Hide the wheel from parent ScrollAreas while adjusting knob
+        if self.config.allow_scroll && response.hovered() {
+            ui.input_mut(|input| input.smooth_scroll_delta = egui::Vec2::ZERO);
+        }
+
         if moved {
             ui.ctx().data_mut(|data| data.insert_temp(response.id, raw));
             *self.value = snap_to_step(raw_to_value(raw, min, max, logarithmic), min, max, step);

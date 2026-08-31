@@ -203,6 +203,10 @@ impl<'a> Knob<'a> {
 }
 
 fn value_to_raw(value: f32, min: f32, max: f32, logarithmic: bool) -> f32 {
+    if min == max {
+        return 0.0;
+    }
+
     if logarithmic {
         remap(value, min..=max, 1.0..=10.0).log(10.0)
     } else {

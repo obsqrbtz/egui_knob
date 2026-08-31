@@ -51,7 +51,7 @@ impl eframe::App for KnobDemo {
             ui.label("Global Settings:");
             ui.checkbox(&mut self.show_bg_arc, "Background arc");
             ui.checkbox(&mut self.show_filled, "Filled segment");
-            ui.checkbox(&mut self.use_step, "Step (0.02)");
+            ui.checkbox(&mut self.use_step, "Step");
             ui.checkbox(&mut self.logarithmic_scaling, "Logarithmic");
         });
 
@@ -72,27 +72,27 @@ impl eframe::App for KnobDemo {
             .num_columns(3)
             .spacing([30.0, 20.0])
             .show(ui, |ui| {
-                for (i, (label, config)) in [
-                    ("Custom Fill", KnobStyle::Dot),
-                    ("Wiper, Sweep", KnobStyle::Wiper),
-                    ("Thick Stroke", KnobStyle::Wiper),
-                    ("360° Sweep", KnobStyle::Wiper),
-                    ("Multi-Turn", KnobStyle::Dot),
-                    ("Large Font", KnobStyle::Wiper),
+                for (i, (label, config, min, max, step)) in [
+                    ("Custom Fill", KnobStyle::Dot, 0., 1., 0.02),
+                    ("Wiper, Sweep", KnobStyle::Wiper, 0., 1., 0.02),
+                    ("Thick Stroke", KnobStyle::Wiper, 0., 1., 0.02),
+                    ("360° Sweep", KnobStyle::Wiper, 0., 1., 0.02),
+                    ("Multi-Turn (0..100)", KnobStyle::Dot, 0., 100., 10.),
+                    ("Large Font (-50..50)", KnobStyle::Wiper, -50., 50., 5.),
                 ]
                 .iter()
                 .enumerate()
                 {
                     ui.vertical(|ui| {
-                        let mut knob = Knob::new(&mut self.values[i], 0., 1., *config)
+                        let mut knob = Knob::new(&mut self.values[i], *min, *max, *config)
                             .with_label(*label, LabelPosition::Bottom)
                             .with_background_arc(self.show_bg_arc)
                             .with_show_filled_segments(self.show_filled)
                             .with_knob_color(self.knob_color)
                             .with_line_color(self.line_color)
                             .with_text_color(self.text_color)
-                            .with_step(self.use_step.then_some(0.02))
-                            .with_double_click_reset(0.5)
+                            .with_step(self.use_step.then_some(*step))
+                            .with_double_click_reset((min + max) * 0.5)
                             .with_middle_scroll();
 
                         if self.logarithmic_scaling {
@@ -111,10 +111,10 @@ impl eframe::App for KnobDemo {
                         if *label == "360° Sweep" {
                             knob = knob.with_sweep_range(0.5, 1.0);
                         }
-                        if *label == "Multi-Turn" {
+                        if *label == "Multi-Turn (0..100)" {
                             knob = knob.with_sweep_range(0.0, 2.5);
                         }
-                        if *label == "Large Font" {
+                        if *label == "Large Font (-50..50)" {
                             knob = knob.with_size(70.0).with_font_size(18.0);
                         }
 

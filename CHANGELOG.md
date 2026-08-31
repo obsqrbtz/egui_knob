@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0]
+
+### 🐛 Fixes
+
+- `with_step` takes the step in `min`/`max` units again, as it did before adding logarithmic scale (reported by [maor1993](https://github.com/maor1993) in
+  [#PR23](https://github.com/obsqrbtz/egui_knob/pull/23))
+- scrolling snaps to `step`
+- non-finite and non-positive steps are ignored instead of corrupting the value.
+
+### ⚠️ Breaking changes
+
+- code written against 0.3.10–0.5.0 that passed a normalized step must pass a step in
+  value units instead. Knobs over 0..1 are unaffected.
+
 ## [0.5.0] - 2026-07-30
 
 - bumped `egui` and `eframe` to v0.36. As consequence, min rust toolchain version is now 1.95.

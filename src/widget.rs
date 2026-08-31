@@ -154,7 +154,8 @@ impl<'a> Knob<'a> {
         self
     }
 
-    /// Sets the step size for value changes
+    /// Sets the step size for value changes, in the same units as `min` and `max`
+    /// Non-finite or non-positive steps are ignored.
     pub fn with_step(mut self, step: Option<f32>) -> Self {
         self.config.step = step;
         self
@@ -190,7 +191,7 @@ impl<'a> Knob<'a> {
     }
 
     /// Allows user to use scroll wheel to change knob value
-    /// Uses config.step for the increment value
+    /// Uses config.drag_sensitivity for the increment value
     pub fn with_middle_scroll(mut self) -> Self {
         self.config.allow_scroll = true;
         self
@@ -201,17 +202,30 @@ impl<'a> Knob<'a> {
     }
 }
 
+fn value_to_raw(value: f32, min: f32, max: f32, logarithmic: bool) -> f32 {
+    if logarithmic {
+        remap(value, min..=max, 1.0..=10.0).log(10.0)
+    } else {
+        remap(value, min..=max, 0.0..=1.0)
+    }
+}
+
+fn raw_to_value(raw: f32, min: f32, max: f32, logarithmic: bool) -> f32 {
+    if logarithmic {
+        remap(10f32.powf(raw), 1.0..=10.0, min..=max)
+    } else {
+        remap(raw, 0.0..=1.0, min..=max)
+    }
+}
+
 impl Widget for Knob<'_> {
     fn ui(self, ui: &mut Ui) -> Response {
         if self.value.is_nan() {
             *self.value = self.min;
         }
 
-        let mut raw = if self.config.logarithmic_scaling {
-            remap(*self.value, self.min..=self.max, 1.0..=10.0).log(10.0)
-        } else {
-            remap(*self.value, self.min..=self.max, 0.0..=1.0)
-        };
+        let logarithmic = self.config.logarithmic_scaling;
+        let mut raw = value_to_raw(*self.value, self.min, self.max, logarithmic);
 
         let renderer = KnobRenderer::new(&self.config, *self.value, raw, self.min, self.max);
         let adjusted_size = renderer.calculate_size(ui);
@@ -219,22 +233,16 @@ impl Widget for Knob<'_> {
         let (rect, response) = ui.allocate_exact_size(adjusted_size, Sense::click_and_drag());
 
         let mut response = response;
+        let mut moved = false;
         if response.dragged() {
-            let delta = response.drag_delta().y;
-            let step = self.config.step.unwrap_or(self.config.drag_sensitivity);
-            raw = (raw - delta * step).clamp(0.0,1.0);
+            let base = ui
+                .ctx()
+                .data(|data| data.get_temp::<f32>(response.id))
+                .unwrap_or(raw);
+            raw = (base - response.drag_delta().y * self.config.drag_sensitivity).clamp(0.0, 1.0);
+            ui.ctx().data_mut(|data| data.insert_temp(response.id, raw));
 
-            raw = if let Some(step) = self.config.step {
-                let steps = (raw / step).round();
-                (steps * step).clamp(0.0, 1.0)
-            } else {
-                raw
-            };
-
-            if self.value.is_nan() {
-                *self.value = 0.0;
-            }
-
+            moved = true;
             response.mark_changed();
         }  else if response.hovered() & self.config.allow_scroll && let Some(scoll) = ui.input(|input| {
                 input.events.iter().find_map(|e| match e {
@@ -242,21 +250,32 @@ impl Widget for Knob<'_> {
                     _ => None,
                 })
             }) {
-            raw = (raw
-                + scoll.y * self.config.step.unwrap_or(self.config.drag_sensitivity))
-            .clamp(0.0, 1.0);
+            raw = (raw + scoll.y * self.config.drag_sensitivity).clamp(0.0, 1.0);
+            moved = true;
         }
 
-        *self.value = if self.config.logarithmic_scaling {
-            remap(10f32.powf(raw), 1.0..=10.0, self.min..=self.max)
-        }else {
-            remap(raw, 0.0..=1.0, self.min..=self.max)
-        };
+        if response.drag_stopped() {
+            ui.ctx().data_mut(|data| data.remove::<f32>(response.id));
+        }
+
+        *self.value = raw_to_value(raw, self.min, self.max, logarithmic);
+
+        if moved
+            && let Some(step) = self.config.step
+            && step.is_finite()
+            && step > 0.0
+        {
+            let steps = ((*self.value - self.min) / step).round();
+            let (lo, hi) = (self.min.min(self.max), self.min.max(self.max));
+            *self.value = (self.min + steps * step).max(lo).min(hi);
+        }
 
         if response.double_clicked()
             && let Some(reset_value) = self.config.reset_value {
                 *self.value = reset_value
             }
+
+        let raw = value_to_raw(*self.value, self.min, self.max, logarithmic).clamp(0.0, 1.0);
 
         let knob_rect = renderer.calculate_knob_rect(rect);
         let center = knob_rect.center();

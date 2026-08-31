@@ -107,7 +107,7 @@ Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
 
 #### Stepped Values
 ```rust
-// Snap to 0.1 increments
+// Snap to 0.1 increments; the step is in the same units as min/max
 Knob::new(&mut value, 0.0, 1.0, KnobStyle::Wiper)
     .with_step(Some(0.1))
     .with_label_format(|v| format!("{:.1}", v));

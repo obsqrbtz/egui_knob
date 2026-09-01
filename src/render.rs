@@ -26,8 +26,7 @@ impl<'a> KnobRenderer<'a> {
         if self.min == self.max || self.raw.is_nan() {
             self.config.min_angle
         } else {
-            self.config.min_angle
-                + self.raw * (self.config.max_angle - self.config.min_angle)
+            self.config.min_angle + self.raw * (self.config.max_angle - self.config.min_angle)
         }
     }
 
@@ -100,9 +99,7 @@ impl<'a> KnobRenderer<'a> {
         ));
 
         if self.config.show_filled_segments {
-            let filled_segments = (segments as f32
-                * self.raw.clamp(0.0, 1.0))
-                as usize;
+            let filled_segments = (segments as f32 * self.raw.clamp(0.0, 1.0)) as usize;
 
             if filled_segments > 0 {
                 let mut fill_points = Vec::with_capacity(filled_segments + 1);

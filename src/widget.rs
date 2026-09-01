@@ -1,4 +1,4 @@
-use egui::{remap, Color32, Response, Sense, Ui, Widget};
+use egui::{Color32, Response, Sense, Ui, Widget, remap};
 
 use crate::config::KnobConfig;
 use crate::render::KnobRenderer;
@@ -53,8 +53,8 @@ impl<'a> Knob<'a> {
             return self;
         }
 
-        self.config.min_angle = 
-            start_angle_normalized.rem_euclid(1.0) * std::f32::consts::TAU + std::f32::consts::PI / 2.0;
+        self.config.min_angle = start_angle_normalized.rem_euclid(1.0) * std::f32::consts::TAU
+            + std::f32::consts::PI / 2.0;
         self.config.max_angle = self.config.min_angle + range.max(0.0) * std::f32::consts::TAU;
         self
     }
@@ -233,6 +233,18 @@ fn snap_to_step(value: f32, min: f32, max: f32, step: Option<f32>) -> f32 {
     }
 }
 
+fn step_index(value: f32, min: f32, step: Option<f32>) -> Option<f32> {
+    step.filter(|step| step.is_finite() && *step > 0.0)
+        .map(|step| ((value - min) / step).round())
+}
+
+fn same_value(a: f32, b: f32, min: f32, step: Option<f32>) -> bool {
+    match step_index(a, min, step) {
+        Some(index) => step_index(b, min, step) == Some(index),
+        None => a == b,
+    }
+}
+
 impl Widget for Knob<'_> {
     fn ui(self, ui: &mut Ui) -> Response {
         if self.value.is_nan() {
@@ -256,7 +268,12 @@ impl Widget for Knob<'_> {
             .ctx()
             .data(|data| data.get_temp::<f32>(response.id))
             .filter(|prev| {
-                snap_to_step(raw_to_value(*prev, min, max, logarithmic), min, max, step) == previous
+                same_value(
+                    snap_to_step(raw_to_value(*prev, min, max, logarithmic), min, max, step),
+                    previous,
+                    min,
+                    step,
+                )
             })
             .unwrap_or(raw);
 
@@ -273,22 +290,18 @@ impl Widget for Knob<'_> {
 
             raw = (base - response.drag_delta().y * sensitivity).clamp(0.0, 1.0);
             moved = true;
-        }  else if response.hovered() & self.config.allow_scroll && let Some(scoll) = ui.input(|input| {
+        } else if response.hovered() & self.config.allow_scroll
+            && let Some(scoll) = ui.input(|input| {
                 input.events.iter().find_map(|e| match e {
                     egui::Event::MouseWheel { delta, .. } if delta.y != 0.0 => Some(*delta),
                     _ => None,
                 })
-            }) {
+            })
+        {
             raw = match step.filter(|step| step.is_finite() && *step > 0.0) {
                 Some(step) => {
-                    let index = (*self.value - min) / step;
-                    let next = if snap_to_step(*self.value, min, max, Some(step)) == *self.value {
-                        index.round() + scoll.y.signum()
-                    } else if scoll.y > 0.0 {
-                        index.ceil()
-                    } else {
-                        index.floor()
-                    };
+                    let index = step_index(*self.value, min, Some(step)).unwrap_or(0.0);
+                    let next = index + scoll.y.signum();
                     value_to_raw(min + next * step, min, max, logarithmic).clamp(0.0, 1.0)
                 }
                 None => (base + scoll.y * self.config.drag_sensitivity).clamp(0.0, 1.0),
@@ -311,9 +324,10 @@ impl Widget for Knob<'_> {
         }
 
         if response.double_clicked()
-            && let Some(reset_value) = self.config.reset_value {
-                *self.value = reset_value
-            }
+            && let Some(reset_value) = self.config.reset_value
+        {
+            *self.value = reset_value
+        }
 
         if *self.value != previous {
             response.mark_changed();
@@ -325,7 +339,8 @@ impl Widget for Knob<'_> {
         let center = knob_rect.center();
         let radius = self.config.size / 2.0;
 
-        let updated_renderer = KnobRenderer::new(&self.config, *self.value, raw, self.min, self.max);
+        let updated_renderer =
+            KnobRenderer::new(&self.config, *self.value, raw, self.min, self.max);
         updated_renderer.render_knob(ui.painter(), center, radius, response.hovered());
         updated_renderer.render_label(ui, rect);
 

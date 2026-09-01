@@ -40,7 +40,7 @@ impl KnobConfig {
             show_background_arc: true,
             show_filled_segments: true,
             reset_value: None,
-            allow_scroll:false,
+            allow_scroll: false,
             logarithmic_scaling: false,
         }
     }

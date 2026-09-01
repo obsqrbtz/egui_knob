@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.2]
+
+### 🐛 Fixes
+
+- dragging a stepped knob no longer skips steps.
+
 ## [0.6.0]
 
 ### 🐛 Fixes

@@ -261,7 +261,17 @@ impl Widget for Knob<'_> {
             .unwrap_or(raw);
 
         if response.dragged() {
-            raw = (base - response.drag_delta().y * self.config.drag_sensitivity).clamp(0.0, 1.0);
+            let mut sensitivity = self.config.drag_sensitivity;
+
+            if let Some(step) = step.filter(|step| step.is_finite() && *step > 0.0) {
+                let one_step =
+                    (value_to_raw(*self.value + step, min, max, logarithmic) - raw).abs();
+                if one_step > 0.0 {
+                    sensitivity = sensitivity.min(one_step);
+                }
+            }
+
+            raw = (base - response.drag_delta().y * sensitivity).clamp(0.0, 1.0);
             moved = true;
         }  else if response.hovered() & self.config.allow_scroll && let Some(scoll) = ui.input(|input| {
                 input.events.iter().find_map(|e| match e {

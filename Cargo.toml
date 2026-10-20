@@ -25,4 +25,4 @@ path = "examples/example_knob.rs"
 egui = "0.36"
 
 [dev-dependencies]
-eframe = { version = "0.36", features = ["default_fonts"] }
+eframe = { version = "0.37", features = ["default_fonts"] }

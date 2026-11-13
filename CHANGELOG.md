@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [0.6.3]
 
+### 🛠 Maintenance
+
+- bumped egui to 0.37
+
+## [0.6.3]
+
 ### 🐛 Fixes
 
 - use index-based steps instead of relying on exact value. With old approach knob was unable to advance if it has offgrid value set by externall caller.

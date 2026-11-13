@@ -31,9 +31,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-egui = "0.36"
-egui_knob = "0.6.3"
-eframe = "0.36"
+egui = "0.37"
+egui_knob = "0.6.4"
+eframe = "0.37"
 ```
 
 ## Usage
